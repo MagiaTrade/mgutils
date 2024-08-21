@@ -56,6 +56,27 @@ namespace mgutils
       return instance;
     }
 
+    void logStream(LogLevel level, const std::string& message)
+    {
+      log(level, message);
+    }
+
+    template <typename T>
+    Logger& operator<<(const T& value)
+    {
+      _stream << value;
+      flush();
+      return *this;
+    }
+
+    Logger& operator<<(LogLevel level)
+    {
+      logStream(level, _stream.str());
+      _stream.str("");
+      _stream.clear();
+      return *this;
+    }
+
     void flush() const
     {
       _traceLogger->flush();
@@ -268,6 +289,9 @@ namespace mgutils
     std::string _warningPattern;
     std::string _errorPattern;
     std::string _criticalPattern;
+
+    std::ostringstream _stream;  // To support <<
+
   };
 
 } // namespace mgutils

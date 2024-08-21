@@ -308,3 +308,25 @@ TEST_CASE("Logger supports variadic formatting", "[logger][variadic]")
   REQUIRE(logContents.find("User Arthur logged in from IP 192.168.1.1") != std::string::npos);
   REQUIRE(logContents.find("Error 404: Not Found") != std::string::npos);
 }
+
+TEST_CASE("Logger supports stream operator <<", "[logger][stream]")
+{
+  auto& logger = mgutils::Logger::instance();
+  std::string logFilename = "stream_test_log.txt";
+
+  std::remove(logFilename.c_str());
+  logger.addFileSink(logFilename);
+  logger.setLogLevel(mgutils::LogLevel::Info);
+
+  logger << "Stream log with value: " << 100 << " and more." << mgutils::LogLevel::Info;
+
+  logger.flush();
+
+  // Verificar o conteúdo do arquivo
+  std::ifstream logFile(logFilename);
+  std::string line;
+  REQUIRE(logFile.is_open());
+  std::getline(logFile, line);
+  REQUIRE(line.find("Stream log with value: 100 and more.") != std::string::npos);
+  logFile.close();
+}
