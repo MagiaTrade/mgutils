@@ -25,12 +25,15 @@ namespace mgutils
   constexpr const char* WHITE = "\033[39m";
   constexpr const char* DARK_GRAY = "\033[38;5;8m";
   constexpr const char* DARK_YELLOW = "\033[33m\033[2m";
+  constexpr const char* BRIGHT_RED = "\033[91m";
 
   enum class LogLevel {
+    Trace,
     Debug,
     Info,
     Warning,
-    Error
+    Error,
+    Critical
   };
 
   class Logger {
@@ -45,11 +48,14 @@ namespace mgutils
     {
       switch (level)
       {
+        case LogLevel::Trace:
+          logCustom(level, DARK_GRAY, message);
+          break;
         case LogLevel::Debug:
           logCustom(level, WHITE, message);
           break;
         case LogLevel::Info:
-          logCustom(level, DARK_GRAY, message);
+          logCustom(level, GREEN, message);
           break;
         case LogLevel::Warning:
           logCustom(level, DARK_YELLOW, message);
@@ -57,12 +63,18 @@ namespace mgutils
         case LogLevel::Error:
           logCustom(level, RED, message);
           break;
+        case LogLevel::Critical:
+          logCustom(level, BRIGHT_RED, message);
+          break;
       }
     }
 
     void logCustom(LogLevel level, const std::string& color_code, const std::string& message)
     {
       switch (level) {
+        case LogLevel::Trace:
+          spdlog::trace("{}{}{}", color_code, "TRACE: " + message, RESET);
+          break;
         case LogLevel::Debug:
           spdlog::debug("{}{}{}", color_code, "DEBUG: " + message, RESET);
           break;
@@ -75,11 +87,18 @@ namespace mgutils
         case LogLevel::Error:
           spdlog::error("{}{}{}", color_code,"ERROR: " +  message, RESET);
           break;
+        case LogLevel::Critical:
+          spdlog::critical("{}{}{}", color_code,"CRITICAL: " +  message, RESET);
+          break;
       }
     }
-      void setLogLevel(LogLevel level)
+
+    void setLogLevel(LogLevel level)
     {
       switch (level) {
+        case LogLevel::Trace:
+          spdlog::set_level(spdlog::level::trace);
+          break;
         case LogLevel::Debug:
           spdlog::set_level(spdlog::level::debug);
           break;
@@ -91,6 +110,9 @@ namespace mgutils
           break;
         case LogLevel::Error:
           spdlog::set_level(spdlog::level::err);
+          break;
+        case LogLevel::Critical:
+          spdlog::set_level(spdlog::level::critical);
           break;
       }
     }
@@ -132,6 +154,7 @@ namespace mgutils
     Logger& operator=(const Logger&) = delete;
 
     std::shared_ptr<spdlog::logger> console_logger_;
+    
   };
 
 } // namespace mgutils
