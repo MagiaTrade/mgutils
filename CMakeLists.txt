@@ -8,6 +8,10 @@ set(MGUTILS_BUILD_EXAMPLES ON)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+endif()
+
 ## External deps BEGIN -----------
 set(EXTERNAL_DIR external)
 
