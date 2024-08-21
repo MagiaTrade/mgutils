@@ -10,7 +10,8 @@
 
 using namespace mgutils;
 
-std::size_t getFileSize(const std::string& filename) {
+std::size_t getFileSize(const std::string& filename)
+{
   struct stat stat_buf;
   int rc = stat(filename.c_str(), &stat_buf);
   return rc == 0 ? stat_buf.st_size : 0;
@@ -273,4 +274,36 @@ TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
   rotatedLogFile1.close();
 
   REQUIRE(rotatedLogContent1.find("Log entry 55") != std::string::npos);
+}
+
+TEST_CASE("Logger supports variadic formatting", "[logger][variadic]")
+{
+  auto& logger = mgutils::Logger::instance();
+  std::string logFilename = "variadic_log.txt";
+
+  std::remove(logFilename.c_str());
+
+  logger.addFileSink(logFilename);
+  logger.setLogLevel(mgutils::LogLevel::Info);
+
+  logger.log(mgutils::LogLevel::Info, "User {} logged in from IP {}", "Arthur", "192.168.1.1");
+  logger.flush();
+
+  logger.log(mgutils::LogLevel::Error, "Error {}: {}", 404, "Not Found");
+  logger.flush();
+
+  std::ifstream logFile(logFilename);
+  REQUIRE(logFile.is_open());
+
+  std::string logContents;
+  std::string line;
+
+  while (std::getline(logFile, line)) {
+    logContents += line + "\n";
+  }
+
+  logFile.close();
+
+  REQUIRE(logContents.find("User Arthur logged in from IP 192.168.1.1") != std::string::npos);
+  REQUIRE(logContents.find("Error 404: Not Found") != std::string::npos);
 }

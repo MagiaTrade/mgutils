@@ -67,33 +67,34 @@ namespace mgutils
       _fileLogger->flush();
     }
 
-    void log(LogLevel level, const std::string& message)
+    template<typename... Args>
+    void log(LogLevel level, const std::string& format, Args&&... args)
     {
       switch (level)
       {
         case LogLevel::Trace:
-          _traceLogger->trace("TRACE: " + message);
-          _fileLogger->trace("TRACE: " + message);
+          _traceLogger->trace(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->trace(fmt::format(format, std::forward<Args>(args)...));
           break;
         case LogLevel::Debug:
-          _debugLogger->debug("DEBUG: " + message);
-          _fileLogger->debug("DEBUG: " + message);
+          _debugLogger->debug(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->debug(fmt::format(format, std::forward<Args>(args)...));
           break;
         case LogLevel::Info:
-          _infoLogger->info("INFO: " + message);
-          _fileLogger->info("INFO: " + message);
+          _infoLogger->info(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->info(fmt::format(format, std::forward<Args>(args)...));
           break;
         case LogLevel::Warning:
-          _warningLogger->warn("WARNING: " + message);
-          _fileLogger->warn("WARNING: " + message);
+          _warningLogger->warn(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->warn(fmt::format(format, std::forward<Args>(args)...));
           break;
         case LogLevel::Error:
-          _errorLogger->error("ERROR: " + message);
-          _fileLogger->error("ERROR: " + message);
+          _errorLogger->error(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->error(fmt::format(format, std::forward<Args>(args)...));
           break;
         case LogLevel::Critical:
-          _criticalLogger->critical("CRITICAL: " + message);
-          _fileLogger->critical("CRITICAL: " + message);
+          _criticalLogger->critical(fmt::format(format, std::forward<Args>(args)...));
+          _fileLogger->critical(fmt::format(format, std::forward<Args>(args)...));
           break;
       }
     }
