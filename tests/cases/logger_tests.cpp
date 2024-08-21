@@ -4,12 +4,12 @@
 #include <catch2/catch.hpp>
 #include <mgutils/Logger.h>
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 #include <sys/stat.h>
 
 using namespace mgutils;
+
 std::size_t getFileSize(const std::string& filename) {
   struct stat stat_buf;
   int rc = stat(filename.c_str(), &stat_buf);
@@ -27,7 +27,7 @@ TEST_CASE("Logger Singleton Instance")
 
 TEST_CASE("Setting Log Levels")
 {
-  auto& logger = mgutils::Logger::instance();
+  auto& logger = Logger::instance();
 
 #ifdef DEBUG
   logger.setLogLevel(Trace);
@@ -56,7 +56,7 @@ TEST_CASE("Setting Log Levels")
 
 TEST_CASE("Logger logs messages at all levels", "[logger]")
 {
-  auto& logger = mgutils::Logger::instance();
+  auto& logger = Logger::instance();
   std::string logFilename = "test_log.txt";
 
   // Remove the file if it exists already
@@ -206,7 +206,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
 TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
 {
-  auto& logger = mgutils::Logger::instance();
+  auto& logger = Logger::instance();
   logger.setPattern("%v");
   std::string logFilename = "rotating_log";
   std::size_t maxSize = 500;  // 1 KB
