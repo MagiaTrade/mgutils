@@ -225,6 +225,8 @@ namespace mgutils
         _fileLogger = spdlog::basic_logger_mt("file_logger", "logs.txt");
         _fileLogger->set_pattern(_cachedPattern);
 
+        _fileLogger->flush_on(spdlog::level::info);
+
         //TODO: set this based on the build type
         spdlog::set_level(spdlog::level::trace);
 
