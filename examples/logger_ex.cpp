@@ -13,7 +13,7 @@ int main()
   logger.setPattern("[%Y-%m-%d %H:%M:%S.%f] %v");
 
   // Define o nível de log para Info
-  logger.setLogLevel(mgutils::LogLevel::Debug);
+  logger.setLogLevel(mgutils::LogLevel::Trace);
 
   // Adiciona um sink para log em arquivo
   logger.addFileSink("app.log");
@@ -22,15 +22,13 @@ int main()
   logger.addRotatingFileSink("app_rotating.log", 1048576 * 5, 3);
 
   // Faz alguns logs de exemplo
+  logger.log(mgutils::LogLevel::Trace, "This is an trace log.");
+  logger.log(mgutils::LogLevel::Debug, "This is an debug log.");
   logger.log(mgutils::LogLevel::Info, "This is an info log.");
   logger.log(mgutils::LogLevel::Warning, "This is a warning log.");
   logger.log(mgutils::LogLevel::Error, "This is an error log.");
-
-  // Log customizado com cor
-  logger.logCustom(mgutils::LogLevel::Debug, mgutils::MAGENTA, "This is a custom MAGENTA log.");
-
-  // Tentativa de log de debug (não será exibido pois o nível de log é Info)
-  logger.log(mgutils::LogLevel::Debug, "This is a debug log that will not be shown.");
+  logger.log(mgutils::LogLevel::Critical, "This is an Critical log.");
+  logger.logCustom(mgutils::LogLevel::Debug, mgutils::MAGENTA, "This is a custom DEBUG MAGENTA log.");
 
   return 0;
 }
