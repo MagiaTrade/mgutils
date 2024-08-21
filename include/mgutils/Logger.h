@@ -37,7 +37,7 @@ namespace mgutils
   constexpr const char* ERROR_COLOR = RED;
   constexpr const char* CRITICAL_COLOR = BRIGHT_RED;
 
-  enum class LogLevel {
+  enum LogLevel {
     Trace,
     Debug,
     Info,

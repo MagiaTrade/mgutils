@@ -9,6 +9,7 @@
 
 #include <sys/stat.h>
 
+using namespace mgutils;
 std::size_t getFileSize(const std::string& filename) {
   struct stat stat_buf;
   int rc = stat(filename.c_str(), &stat_buf);
@@ -29,27 +30,27 @@ TEST_CASE("Setting Log Levels")
   auto& logger = mgutils::Logger::instance();
 
 #ifdef DEBUG
-  logger.setLogLevel(mgutils::LogLevel::Trace);
+  logger.setLogLevel(Trace);
   REQUIRE(spdlog::get_level() == spdlog::level::trace);
 #else
-  logger.setLogLevel(mgutils::LogLevel::Trace);
+  logger.setLogLevel(Trace);
   REQUIRE(spdlog::get_level() == spdlog::level::info);
 #endif
 
 #ifdef DEBUG
-  logger.setLogLevel(mgutils::LogLevel::Debug);
+  logger.setLogLevel(Debug);
   REQUIRE(spdlog::get_level() == spdlog::level::debug);
 #else
-  logger.setLogLevel(mgutils::LogLevel::Debug);
+  logger.setLogLevel(Debug);
   REQUIRE(spdlog::get_level() == spdlog::level::info);
 #endif
 
   // Set log level to Info and check that the correct level is set
-  logger.setLogLevel(mgutils::LogLevel::Info);
+  logger.setLogLevel(Info);
   REQUIRE(spdlog::get_level() == spdlog::level::info);
 
   // Set log level to Error and check that the correct level is set
-  logger.setLogLevel(mgutils::LogLevel::Error);
+  logger.setLogLevel(Error);
   REQUIRE(spdlog::get_level() == spdlog::level::err);
 }
 
@@ -65,12 +66,12 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   auto loggAll = [&]()
   {
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
+    logger.log(Trace, "Trace message");
+    logger.log(Debug, "Debug message");
+    logger.log(Info, "Info message");
+    logger.log(Warning, "Warning message");
+    logger.log(Error, "Error message");
+    logger.log(Critical, "Critical message");
 
     logger.flush();
   };
@@ -94,7 +95,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("All levels")
   {
-    logger.setLogLevel(mgutils::LogLevel::Trace);
+    logger.setLogLevel(Trace);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -119,7 +120,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("Debug and above")
   {
-    logger.setLogLevel(mgutils::LogLevel::Debug);
+    logger.setLogLevel(Debug);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -143,7 +144,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("Info and above")
   {
-    logger.setLogLevel(mgutils::LogLevel::Info);
+    logger.setLogLevel(Info);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -158,7 +159,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("Warning and above")
   {
-    logger.setLogLevel(mgutils::LogLevel::Warning);
+    logger.setLogLevel(Warning);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -174,7 +175,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("Error and above")
   {
-    logger.setLogLevel(mgutils::LogLevel::Error);
+    logger.setLogLevel(Error);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -189,7 +190,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   SECTION("Critical only")
   {
-    logger.setLogLevel(mgutils::LogLevel::Critical);
+    logger.setLogLevel(Critical);
 
     loggAll();
     auto logContents  = getFileContent();
@@ -225,7 +226,7 @@ TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
 
   logger.addRotatingFileSink(logFilename, maxSize, maxFiles);
 
-  logger.setLogLevel(mgutils::LogLevel::Info);
+  logger.setLogLevel(Info);
 
   // 75 to discount the INFO: Log entry <n>: prefix of eacho log
   // this way each line is almost 100 characters
@@ -237,7 +238,7 @@ TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
 
   for (int i = 1; i <= 100; ++i)
   {
-    logger.log(mgutils::LogLevel::Info, "Log entry " + std::to_string(i) + ": " + largeMessage);
+    logger.log(Info, "Log entry " + std::to_string(i) + ": " + largeMessage);
     logger.flush();
 
     std::size_t fileSize = getFileSize(logFilename);
