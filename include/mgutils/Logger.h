@@ -178,6 +178,7 @@ namespace mgutils
         spdlog::set_default_logger(console_logger_);
         spdlog::set_level(spdlog::level::debug); // Set the default log level to debug
         cached_pattern_ = "[%Y-%m-%d %H:%M:%S.%f] [thread %t] %v"; // Default log pattern
+        setPattern(cached_pattern_);
         spdlog::set_pattern(cached_pattern_);  // Apply the default pattern
       } catch (const spdlog::spdlog_ex& ex) {
         throw std::runtime_error("Failed to initialize logger: " + std::string(ex.what()));
