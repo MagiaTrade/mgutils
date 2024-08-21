@@ -196,6 +196,7 @@ namespace mgutils
     {
       auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
       _fileLogger->sinks().push_back(file_sink);
+      _fileLogger->set_pattern(_cachedPattern);
     }
 
     // Add a rotating file sink for logging to files with rotation based on size
@@ -203,6 +204,7 @@ namespace mgutils
     {
       auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
       _fileLogger->sinks().push_back(rotating_sink);
+      _fileLogger->set_pattern(_cachedPattern);
     }
 
   private:

@@ -5,6 +5,15 @@
 #include <mgutils/Logger.h>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+
+#include <sys/stat.h>
+
+std::size_t getFileSize(const std::string& filename) {
+  struct stat stat_buf;
+  int rc = stat(filename.c_str(), &stat_buf);
+  return rc == 0 ? stat_buf.st_size : 0;
+}
 
 TEST_CASE("Logger Singleton Instance")
 {
@@ -192,4 +201,75 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
     REQUIRE(logContents.find("Error message") == std::string::npos);
     REQUIRE(logContents.find("Critical message") != std::string::npos);
   }
+}
+
+TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
+{
+  auto& logger = mgutils::Logger::instance();
+  logger.setPattern("%v");
+  std::string logFilename = "rotating_log";
+  std::size_t maxSize = 500;  // 1 KB
+  std::size_t maxFiles = 9;    // Máximo de 3 arquivos de backup, 4 no total com o ativo
+
+  // Remove arquivos anteriores se existirem
+  std::remove(logFilename.c_str());
+  std::remove((logFilename + ".1").c_str());
+  std::remove((logFilename + ".2").c_str());
+  std::remove((logFilename + ".3").c_str());
+  std::remove((logFilename + ".4").c_str());
+  std::remove((logFilename + ".5").c_str());
+  std::remove((logFilename + ".6").c_str());
+  std::remove((logFilename + ".7").c_str());
+  std::remove((logFilename + ".8").c_str());
+  std::remove((logFilename + ".9").c_str());
+
+  logger.addRotatingFileSink(logFilename, maxSize, maxFiles);
+
+  logger.setLogLevel(mgutils::LogLevel::Info);
+
+  // 75 to discount the INFO: Log entry <n>: prefix of eacho log
+  // this way each line is almost 100 characters
+  // 100 * 100 = 10000
+  // 10000/ 500 = 20 files
+  // so at the end the first file should have the Log entry  96 to 100 messages
+  // the last (.9) file should have the have the Log entry 51 to 55
+  std::string largeMessage = std::string(75, 'X');
+
+  for (int i = 1; i <= 100; ++i)
+  {
+    logger.log(mgutils::LogLevel::Info, "Log entry " + std::to_string(i) + ": " + largeMessage);
+    logger.flush();
+
+    std::size_t fileSize = getFileSize(logFilename);
+    std::cout << "File size after log: " << i << " -> " << fileSize << " bytes" << std::endl;
+  }
+
+  REQUIRE(std::ifstream(logFilename).is_open());
+  REQUIRE(std::ifstream(logFilename + ".9").is_open());
+
+  std::ifstream logFile(logFilename);
+  std::string lastLogContent;
+  std::string line;
+
+  REQUIRE(logFile.is_open());
+
+  while (std::getline(logFile, line)) {
+    lastLogContent = line;
+  }
+
+  logFile.close();
+
+  REQUIRE(lastLogContent.find("Log entry 100") != std::string::npos);
+
+  std::ifstream rotatedLogFile1(logFilename + ".9");
+  std::string rotatedLogContent1;
+  REQUIRE(rotatedLogFile1.is_open());
+
+  while (std::getline(rotatedLogFile1, line)) {
+    rotatedLogContent1 += line + "\n";
+  }
+
+  rotatedLogFile1.close();
+
+  REQUIRE(rotatedLogContent1.find("Log entry 55") != std::string::npos);
 }
