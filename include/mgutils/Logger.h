@@ -55,6 +55,18 @@ namespace mgutils
       return instance;
     }
 
+    void flush() const
+    {
+      _traceLogger->flush();
+      _debugLogger->flush();
+      _infoLogger->flush();
+      _warningLogger->flush();
+      _errorLogger->flush();
+      _criticalLogger->flush();
+      _customLogger->flush();
+      _fileLogger->flush();
+    }
+
     void log(LogLevel level, const std::string& message)
     {
       switch (level)
@@ -224,11 +236,6 @@ namespace mgutils
         // Logger para arquivo, sem cores, mas com rotação de arquivos
         _fileLogger = spdlog::basic_logger_mt("file_logger", "logs.txt");
         _fileLogger->set_pattern(_cachedPattern);
-
-        _fileLogger->flush_on(spdlog::level::info);
-
-        //TODO: set this based on the build type
-        spdlog::set_level(spdlog::level::trace);
 
 #ifdef DEBUG
         spdlog::set_level(spdlog::level::trace);

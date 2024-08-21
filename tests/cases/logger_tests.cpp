@@ -54,10 +54,8 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 
   logger.addFileSink(logFilename);
 
-  SECTION("All levels")
+  auto loggAll = [&]()
   {
-    logger.setLogLevel(mgutils::LogLevel::Trace);
-
     logger.log(mgutils::LogLevel::Trace, "Trace message");
     logger.log(mgutils::LogLevel::Debug, "Debug message");
     logger.log(mgutils::LogLevel::Info, "Info message");
@@ -65,6 +63,11 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
     logger.log(mgutils::LogLevel::Error, "Error message");
     logger.log(mgutils::LogLevel::Critical, "Critical message");
 
+    logger.flush();
+  };
+
+  auto getFileContent = [&]() -> std::string
+  {
     // Verifica se as mensagens foram gravadas no arquivo de log
     std::ifstream logFile(logFilename);
     std::string line;
@@ -77,21 +80,30 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
     }
 
     logFile.close();
+    return logContents.str();
+  };
+
+  SECTION("All levels")
+  {
+    logger.setLogLevel(mgutils::LogLevel::Trace);
+
+    loggAll();
+    auto logContents  = getFileContent();
 
 #ifdef DEBUG
-    REQUIRE(logContents.str().find("Trace message") != std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") != std::string::npos);
-    REQUIRE(logContents.str().find("Info message") != std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") != std::string::npos);
+    REQUIRE(logContents.find("Debug message") != std::string::npos);
+    REQUIRE(logContents.find("Info message") != std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
 #else
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") != std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") != std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
 #endif
 
   }
@@ -100,40 +112,23 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
   {
     logger.setLogLevel(mgutils::LogLevel::Debug);
 
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
-
-    // Verifica se as mensagens foram gravadas no arquivo de log
-    std::ifstream logFile(logFilename);
-    std::string line;
-    std::stringstream logContents;
-
-    REQUIRE(logFile.is_open());
-
-    while (std::getline(logFile, line)) {
-      logContents << line << "\n";
-    }
-
-    logFile.close();
+    loggAll();
+    auto logContents  = getFileContent();
 
 #ifdef DEBUG
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") != std::string::npos);
-    REQUIRE(logContents.str().find("Info message") != std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") != std::string::npos);
+    REQUIRE(logContents.find("Info message") != std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
 #else
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") != std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") != std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
 #endif
   }
 
@@ -141,65 +136,30 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
   {
     logger.setLogLevel(mgutils::LogLevel::Info);
 
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
+    loggAll();
+    auto logContents  = getFileContent();
 
-    // Verifica se as mensagens foram gravadas no arquivo de log
-    std::ifstream logFile(logFilename);
-    std::string line;
-    std::stringstream logContents;
-
-    REQUIRE(logFile.is_open());
-
-    while (std::getline(logFile, line)) {
-      logContents << line << "\n";
-    }
-
-    logFile.close();
-
-
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") != std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") != std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
   }
 
   SECTION("Warning and above")
   {
     logger.setLogLevel(mgutils::LogLevel::Warning);
 
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
+    loggAll();
+    auto logContents  = getFileContent();
 
-    // Verifica se as mensagens foram gravadas no arquivo de log
-    std::ifstream logFile(logFilename);
-    std::string line;
-    std::stringstream logContents;
-
-    REQUIRE(logFile.is_open());
-
-    while (std::getline(logFile, line)) {
-      logContents << line << "\n";
-    }
-
-    logFile.close();
-
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") == std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") == std::string::npos);
+    REQUIRE(logContents.find("Warning message") != std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
   }
 
 
@@ -207,86 +167,29 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
   {
     logger.setLogLevel(mgutils::LogLevel::Error);
 
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
+    loggAll();
+    auto logContents  = getFileContent();
 
-    // Verifica se as mensagens foram gravadas no arquivo de log
-    std::ifstream logFile(logFilename);
-    std::string line;
-    std::stringstream logContents;
-
-    REQUIRE(logFile.is_open());
-
-    while (std::getline(logFile, line)) {
-      logContents << line << "\n";
-    }
-
-    logFile.close();
-
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") == std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") == std::string::npos);
-    REQUIRE(logContents.str().find("Error message") != std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") == std::string::npos);
+    REQUIRE(logContents.find("Warning message") == std::string::npos);
+    REQUIRE(logContents.find("Error message") != std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
   }
 
   SECTION("Critical only")
   {
     logger.setLogLevel(mgutils::LogLevel::Critical);
 
-    logger.log(mgutils::LogLevel::Trace, "Trace message");
-    logger.log(mgutils::LogLevel::Debug, "Debug message");
-    logger.log(mgutils::LogLevel::Info, "Info message");
-    logger.log(mgutils::LogLevel::Warning, "Warning message");
-    logger.log(mgutils::LogLevel::Error, "Error message");
-    logger.log(mgutils::LogLevel::Critical, "Critical message");
+    loggAll();
+    auto logContents  = getFileContent();
 
-    // Verifica se as mensagens foram gravadas no arquivo de log
-    std::ifstream logFile(logFilename);
-    std::string line;
-    std::stringstream logContents;
-
-    REQUIRE(logFile.is_open());
-
-    while (std::getline(logFile, line)) {
-      logContents << line << "\n";
-    }
-
-    logFile.close();
-
-    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
-    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
-    REQUIRE(logContents.str().find("Info message") == std::string::npos);
-    REQUIRE(logContents.str().find("Warning message") == std::string::npos);
-    REQUIRE(logContents.str().find("Error message") == std::string::npos);
-    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+    REQUIRE(logContents.find("Trace message") == std::string::npos);
+    REQUIRE(logContents.find("Debug message") == std::string::npos);
+    REQUIRE(logContents.find("Info message") == std::string::npos);
+    REQUIRE(logContents.find("Warning message") == std::string::npos);
+    REQUIRE(logContents.find("Error message") == std::string::npos);
+    REQUIRE(logContents.find("Critical message") != std::string::npos);
   }
 }
-
-//TEST_CASE("Setting and Using Custom Patterns") {
-//  auto& logger = mgutils::Logger::instance();
-//  std::string customPattern = "[%H:%M:%S] %v"; // Custom pattern for testing
-//
-//  // Set custom pattern
-//  logger.setPattern(customPattern);
-//
-//  // Test logging with the custom pattern
-//  logger.log(mgutils::LogLevel::Info, "This log uses a custom pattern.");
-//
-//  // Validate that the pattern is set correctly
-//  // In real tests, you'd capture and validate the log output
-//}
-
-//TEST_CASE("Custom Color Log") {
-//  auto& logger = mgutils::Logger::instance();
-//
-//  // Test a custom color log message
-//  logger.logCustom(mgutils::LogLevel::Debug, mgutils::CYAN, "This is a cyan debug log.");
-//
-//  // Again, in a more comprehensive test, you'd redirect output and validate
-//}
