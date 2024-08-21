@@ -6,7 +6,8 @@
 #include <fstream>
 #include <sstream>
 
-TEST_CASE("Logger Singleton Instance") {
+TEST_CASE("Logger Singleton Instance")
+{
   // Ensure that the Logger instance is always the same (singleton pattern)
   auto& logger1 = mgutils::Logger::instance();
   auto& logger2 = mgutils::Logger::instance();
@@ -14,7 +15,8 @@ TEST_CASE("Logger Singleton Instance") {
   REQUIRE(&logger1 == &logger2); // Both should point to the same instance
 }
 
-TEST_CASE("Setting Log Levels") {
+TEST_CASE("Setting Log Levels")
+{
   auto& logger = mgutils::Logger::instance();
 
 #ifdef DEBUG
@@ -42,7 +44,8 @@ TEST_CASE("Setting Log Levels") {
   REQUIRE(spdlog::get_level() == spdlog::level::err);
 }
 
-TEST_CASE("Logger logs messages at all levels", "[logger]") {
+TEST_CASE("Logger logs messages at all levels", "[logger]")
+{
   auto& logger = mgutils::Logger::instance();
   std::string logFilename = "test_log.txt";
 
@@ -50,7 +53,6 @@ TEST_CASE("Logger logs messages at all levels", "[logger]") {
   std::remove(logFilename.c_str());
 
   logger.addFileSink(logFilename);
-
 
   SECTION("All levels")
   {
@@ -76,12 +78,22 @@ TEST_CASE("Logger logs messages at all levels", "[logger]") {
 
     logFile.close();
 
+#ifdef DEBUG
     REQUIRE(logContents.str().find("Trace message") != std::string::npos);
     REQUIRE(logContents.str().find("Debug message") != std::string::npos);
     REQUIRE(logContents.str().find("Info message") != std::string::npos);
     REQUIRE(logContents.str().find("Warning message") != std::string::npos);
     REQUIRE(logContents.str().find("Error message") != std::string::npos);
     REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+#else
+    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
+    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
+    REQUIRE(logContents.str().find("Info message") != std::string::npos);
+    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
+    REQUIRE(logContents.str().find("Error message") != std::string::npos);
+    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+#endif
+
   }
 
   SECTION("Debug and above")
@@ -108,12 +120,21 @@ TEST_CASE("Logger logs messages at all levels", "[logger]") {
 
     logFile.close();
 
+#ifdef DEBUG
     REQUIRE(logContents.str().find("Trace message") == std::string::npos);
     REQUIRE(logContents.str().find("Debug message") != std::string::npos);
     REQUIRE(logContents.str().find("Info message") != std::string::npos);
     REQUIRE(logContents.str().find("Warning message") != std::string::npos);
     REQUIRE(logContents.str().find("Error message") != std::string::npos);
     REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+#else
+    REQUIRE(logContents.str().find("Trace message") == std::string::npos);
+    REQUIRE(logContents.str().find("Debug message") == std::string::npos);
+    REQUIRE(logContents.str().find("Info message") != std::string::npos);
+    REQUIRE(logContents.str().find("Warning message") != std::string::npos);
+    REQUIRE(logContents.str().find("Error message") != std::string::npos);
+    REQUIRE(logContents.str().find("Critical message") != std::string::npos);
+#endif
   }
 
   SECTION("Info and above")
@@ -139,6 +160,7 @@ TEST_CASE("Logger logs messages at all levels", "[logger]") {
     }
 
     logFile.close();
+
 
     REQUIRE(logContents.str().find("Trace message") == std::string::npos);
     REQUIRE(logContents.str().find("Debug message") == std::string::npos);
