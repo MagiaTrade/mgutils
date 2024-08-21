@@ -278,18 +278,19 @@ TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
 
 TEST_CASE("Logger supports variadic formatting", "[logger][variadic]")
 {
-  auto& logger = mgutils::Logger::instance();
+  auto& logger = Logger::instance();
+  logger.setPattern("%v", false);
   std::string logFilename = "variadic_log.txt";
 
   std::remove(logFilename.c_str());
 
   logger.addFileSink(logFilename);
-  logger.setLogLevel(mgutils::LogLevel::Info);
+  logger.setLogLevel(Info);
 
-  logger.log(mgutils::LogLevel::Info, "User {} logged in from IP {}", "Arthur", "192.168.1.1");
+  logger.log(Info, "User {} logged in from IP {}", "Arthur", "192.168.1.1");
   logger.flush();
 
-  logger.log(mgutils::LogLevel::Error, "Error {}: {}", 404, "Not Found");
+  logger.log(Error, "Error {}: {}", 404, "Not Found");
   logger.flush();
 
   std::ifstream logFile(logFilename);

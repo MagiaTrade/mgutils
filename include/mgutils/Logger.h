@@ -28,6 +28,7 @@ namespace mgutils
   constexpr const char* LIGHT_GRAY = "\033[37m"; // Light gray
   constexpr const char* DARK_YELLOW = "\033[33m\033[2m"; // Dark yellow (dimmed)
   constexpr const char* BRIGHT_RED = "\033[91m";  // Bright red
+  constexpr const char* BLACK_TEXT_RED_BG = "\033[30;101m";  // Black text with bright red background
 
   // Define color variables for each log level
   constexpr const char* TRACE_COLOR = DARK_GRAY;
@@ -35,7 +36,7 @@ namespace mgutils
   constexpr const char* INFO_COLOR = BLUE;
   constexpr const char* WARNING_COLOR = DARK_YELLOW;
   constexpr const char* ERROR_COLOR = RED;
-  constexpr const char* CRITICAL_COLOR = BRIGHT_RED;
+  constexpr const char* CRITICAL_COLOR = BLACK_TEXT_RED_BG;
 
   enum LogLevel {
     Trace,
@@ -100,36 +101,37 @@ namespace mgutils
     }
 
     // Log a custom message with a specified color and log level
-    void logCustom(LogLevel level, const std::string& color_code, const std::string& message)
+    template<typename... Args>
+    void logCustom(LogLevel level, const std::string& color_code, const std::string& message, Args&&... args)
     {
       std::string customPattern = color_code + _cachedPattern + RESET;
       _customLogger->set_pattern(customPattern);
 
       switch (level) {
         case LogLevel::Trace:
-          _customLogger->trace("TRACE: " + message);
-          _fileLogger->trace("TRACE: " + message);
+          _customLogger->trace(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->trace(fmt::format(message, std::forward<Args>(args)...));
           break;
         case LogLevel::Debug:
-          _customLogger->debug("DEBUG: " + message);
-          _fileLogger->debug("DEBUG: " + message);
+          _customLogger->debug(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->debug(fmt::format(message, std::forward<Args>(args)...));
           break;
         case LogLevel::Info:
-          _customLogger->info("INFO: " + message);
-          _fileLogger->info("INFO: " + message);
+          _customLogger->info(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->info(fmt::format(message, std::forward<Args>(args)...));
           break;
         case LogLevel::Warning:
-          _customLogger->warn("WARNING: " + message);
-          _fileLogger->warn("WARNING: " + message);
+          _customLogger->warn(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->warn(fmt::format(message, std::forward<Args>(args)...));
 
           break;
         case LogLevel::Error:
-          _customLogger->error("ERROR: " + message);
-          _fileLogger->error("ERROR: " + message);
+          _customLogger->error(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->error(fmt::format(message, std::forward<Args>(args)...));
           break;
         case LogLevel::Critical:
-          _customLogger->critical("CRITICAL: " + message);
-          _fileLogger->critical("CRITICAL: " + message);
+          _customLogger->critical(fmt::format(message, std::forward<Args>(args)...));
+          _fileLogger->critical(fmt::format(message, std::forward<Args>(args)...));
           break;
       }
     }
@@ -171,9 +173,12 @@ namespace mgutils
     }
 
     // Cache the logging pattern and prepare preformatted patterns for each log level
-    void setPattern(const std::string& pattern)
+    void setPattern(const std::string& pattern, bool usesConsoleTag = true)
     {
-      _cachedPattern = pattern; // Store the pattern for later use on log custom
+      if(usesConsoleTag)
+        _cachedPattern = "%L: " + pattern;
+      else
+        _cachedPattern = pattern;
 
       _tracePattern = TRACE_COLOR + _cachedPattern + RESET;
       _debugPattern = DEBUG_COLOR + _cachedPattern + RESET;
@@ -188,6 +193,7 @@ namespace mgutils
       _warningLogger->set_pattern(_warningPattern);
       _errorLogger->set_pattern(_errorPattern);
       _criticalLogger->set_pattern(_criticalPattern);
+
 
       _fileLogger->set_pattern(_cachedPattern);
     }
@@ -212,33 +218,20 @@ namespace mgutils
     Logger()
     {
       try {
-        _cachedPattern = "[%Y-%m-%d %H:%M:%S.%f] [thread %t] %v"; // Default log pattern
+        // Default log pattern
+        _cachedPattern = "[%Y-%m-%d %H:%M:%S.%f] [thread %t] %v";
 
-        // Inicializa os loggers com cores específicas para o console
         _traceLogger = spdlog::stdout_color_mt("trace_logger");
-        _traceLogger->set_pattern(TRACE_COLOR + _cachedPattern + RESET);
-
         _debugLogger = spdlog::stdout_color_mt("debug_logger");
-        _debugLogger->set_pattern(DEBUG_COLOR + _cachedPattern + RESET);
-
         _infoLogger = spdlog::stdout_color_mt("info_logger");
-        _infoLogger->set_pattern(INFO_COLOR + _cachedPattern + RESET);
-
         _warningLogger = spdlog::stdout_color_mt("warning_logger");
-        _warningLogger->set_pattern(WARNING_COLOR + _cachedPattern + RESET);
-
         _errorLogger = spdlog::stdout_color_mt("error_logger");
-        _errorLogger->set_pattern(ERROR_COLOR + _cachedPattern + RESET);
-
         _criticalLogger = spdlog::stdout_color_mt("critical_logger");
-        _criticalLogger->set_pattern(CRITICAL_COLOR + _cachedPattern + RESET);
-
         _customLogger = spdlog::stdout_color_mt("custom_logger");
-        _customLogger->set_pattern(_cachedPattern);
 
-        // Logger para arquivo, sem cores, mas com rotação de arquivos
+        //default log file. TODO:: think about this
         _fileLogger = spdlog::basic_logger_mt("file_logger", "logs.txt");
-        _fileLogger->set_pattern(_cachedPattern);
+        setPattern(_cachedPattern);
 
 #ifdef DEBUG
         spdlog::set_level(spdlog::level::trace);
