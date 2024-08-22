@@ -148,7 +148,7 @@ TEST_CASE("ErrorManager multithreading", "[ErrorManager][multithreading]")
   connection.disconnect();
 }
 
-// Test case to verify that logger notifications trigger the ErrorManager correctly
+// Test case to verify that logger error notifications triggers the ErrorManager correctly
 TEST_CASE("ErrorManager from logger notification error", "[ErrorManager]")
 {
   ErrorInfo receivedError{0, "", "", 0};
@@ -179,7 +179,7 @@ TEST_CASE("ErrorManager from logger notification error", "[ErrorManager]")
   connection.disconnect();
 }
 
-// Test case to verify that logger notifications trigger critical errors in ErrorManager correctly
+// Test case to verify that logger critical notifications triggers the ErrorManager correctly
 TEST_CASE("ErrorManager from logger notification critical", "[ErrorManager]")
 {
   ErrorInfo receivedError{0, "", "", 0};
