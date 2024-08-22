@@ -363,7 +363,6 @@ TEST_CASE("Logger macros", "[logger][macros]")
   logFile.close();
 }
 
-
 TEST_CASE("Logger move", "[logger][move]")
 {
   Logger logger1("custom_log.txt");
