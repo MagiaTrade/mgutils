@@ -161,7 +161,7 @@ namespace mgutils
     // Add a rotating file sink for logging to files with rotation based on size
     void addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files);
 
-    Logger();
+    explicit Logger(const std::string& logFilename = "");
     ~Logger() = default;
   private:
 

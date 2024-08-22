@@ -30,6 +30,30 @@ namespace mgutils
     return ss.str();
   }
 
+  inline std::string generateID(std::size_t length)
+  {
+    const char characters[] =
+        "0123456789"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    const std::size_t charactersCount = sizeof(characters) - 1;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, charactersCount - 1);
+
+    std::string result;
+    result.reserve(length);
+
+    for (std::size_t i = 0; i < length; ++i)
+    {
+      result += characters[dis(gen)];
+    }
+
+    return result;
+  }
+
   namespace string
   {
 
