@@ -25,5 +25,13 @@ else
   git clone git@github.com:oneapi-src/oneTBB.git "$DIR/onetbb"
 fi
 
+if [ -d "$DIR/rapidjson" ]; then
+  echo "$DIR rapidjson exists!"
+else
+  echo "$DIR Downloading rapidjson:"
+  git clone https://github.com/Tencent/rapidjson.git "$DIR/rapidjson"
+fi
+
+
 
 

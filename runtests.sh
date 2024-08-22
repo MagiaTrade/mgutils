@@ -28,10 +28,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # Navigate to the docs directory inside the build directory
-cd docs || { echo "Failed to enter the docs directory"; exit 1; }
+cd tests || { echo "Failed to enter the docs directory"; exit 1; }
 
 # Execute the mgu_docs binary
-./mgu_doc
+./mgutils_tests
 
 # Return to the original directory
 cd "$current_dir" || { echo "Failed to return to the original directory"; exit 1; }

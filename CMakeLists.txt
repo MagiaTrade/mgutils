@@ -14,7 +14,9 @@ set(MG_UTILS_FILES
     include/mgutils/Utils.h
     include/mgutils/ErrorManager.h
     include/mgutils/JobPool.h
-)
+    include/mgutils/Json.cpp include/mgutils/Json.h
+    include/mgutils/Json.cpp include/mgutils/Json.cpp
+    )
 
 add_library(${PROJECT_NAME}  STATIC
     ${MG_UTILS_FILES}
@@ -52,6 +54,15 @@ set(TBB_TEST OFF)                            #
 # ------------------------------------------ #
 add_subdirectory(external/oneTBB)
 
+
+# turn off rapidjson extra builds
+set(RAPIDJSON_BUILD_DOC OFF)
+set(RAPIDJSON_BUILD_EXAMPLES OFF)
+set(RAPIDJSON_BUILD_TESTS OFF)
+set(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT OFF)
+
+add_subdirectory(external/rapidjson)
+
 ## External deps END -----------
 
 ## BOOST BEGIN -------------
@@ -71,8 +82,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     include
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} PUBLIC
     include/mgutils
+    external/rapidjson/include
+    external/catch2/single_include
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -81,7 +94,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 )
 
 if (${MGUTILS_BUILD_TESTS})
-    add_subdirectory(docs)
+    add_subdirectory(tests)
 endif()
 
 if (${MGUTILS_BUILD_EXAMPLES})
