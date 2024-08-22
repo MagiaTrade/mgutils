@@ -187,3 +187,15 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(nestedItems[1].asString() == std::optional<std::string>("nested2"));
   }
 }
+
+TEST_CASE("JsonValue Root")
+{
+  JsonDocument document;
+  JsonValue jsonValue = JsonValue("testValue", document.getAllocator());
+
+  REQUIRE(jsonValue.asString() == std::optional<std::string>("testValue"));
+
+  jsonValue.set("testkey", "New valor");
+
+  REQUIRE(jsonValue.getString("testkey") == std::optional<std::string>("New valor"));
+}

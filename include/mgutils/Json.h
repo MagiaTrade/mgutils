@@ -93,6 +93,10 @@ namespace mgutils
                     std::is_same<DecayedT, const char*>::value,
                     "Invalid type for set function");
 
+      if (!_value.IsObject()) {
+        _value.SetObject();
+      }
+
       if constexpr (std::is_same<T, bool>::value) {
         // Implementar para bool
         return setBool(key, value);
@@ -140,6 +144,10 @@ namespace mgutils
                     std::is_same<T, std::vector<JsonValue>>::value ||
                     std::is_same<DecayedT, const char*>::value,
                     "Invalid type for set function");
+
+      if (!_value.IsObject()) {
+        _value.SetObject();
+      }
 
       if constexpr (std::is_same<T, bool>::value) {
         // Implementar para bool

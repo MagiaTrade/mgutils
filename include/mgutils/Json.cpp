@@ -77,68 +77,64 @@ namespace mgutils
 
   // JSONValue -----------
 
-  // Construtor que copia o valor de rapidjson::Value
-  JsonValue::JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator):
-  _value(value, allocator),
-  _allocator(allocator) {}
-
-
-//   Construtor de movimento
+  // Movement constructor
   JsonValue::JsonValue(JsonValue&& other) noexcept:
-  _value(std::move(other._value)), _allocator(other._allocator)
-  {}
+  _value(std::move(other._value)), _allocator(other._allocator){}
 
   JsonValue& JsonValue::operator=(JsonValue&& other) noexcept
   {
     if (this != &other) {
-      _value = std::move(other._value);  // Move o rapidjson::Value
-      _allocator = other._allocator;  // Copia o alocador
+      _value = std::move(other._value);  // Moves rapidjson::Value
+      _allocator = other._allocator;  // Copies allocator
     }
     return *this;
   }
 
 
-JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNullType), _allocator(allocator) {}
+  JsonValue::JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator):
+  _value(value, allocator),_allocator(allocator) {}
 
-  JsonValue::JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kStringType), _allocator(allocator)
+  JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNullType), _allocator(allocator) {}
+
+  JsonValue::JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kStringType), _allocator(allocator)
   {
     _value.SetString(value.c_str(), allocator);
   }
 
-  JsonValue::JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kStringType), _allocator(allocator)
+  JsonValue::JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kStringType), _allocator(allocator)
   {
     _value.SetString(value, allocator);
   }
 
-  JsonValue::JsonValue(bool value, rapidjson::Document::AllocatorType& allocator)
-      : _value(rapidjson::kFalseType), _allocator(allocator)
+  JsonValue::JsonValue(bool value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kFalseType), _allocator(allocator)
   {
     _value.SetBool(value);
   }
 
-  JsonValue::JsonValue(int value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(int value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetInt(value);
   }
 
-  JsonValue::JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetInt64(value);
   }
 
-  JsonValue::JsonValue(uint value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(uint value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetUint(value);
   }
 
-  JsonValue::JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetUint64(value);
   }
@@ -149,15 +145,15 @@ JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator)
     _value.SetFloat(value);
   }
 
-  JsonValue::JsonValue(double value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(double value, rapidjson::Document::AllocatorType& allocator):
+  _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetDouble(value);
   }
 
   JsonValue JsonDocument::getRoot()
   {
-    return JsonValue(_document, _allocator);
+    return {_document, _allocator};
   }
 
   bool JsonValue::hasBool(const std::string& memberName) const {
@@ -261,10 +257,6 @@ JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator)
 
   JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>& values)
   {
-    if (!_value.IsObject()) {
-      _value.SetObject();
-    }
-
     rapidjson::Value array(rapidjson::kArrayType);
     for (auto& val : values) {
       array.PushBack(val._value, _allocator);
@@ -282,10 +274,6 @@ JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator)
 
   JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>&& values)
   {
-    if (!_value.IsObject()) {
-      _value.SetObject();
-    }
-
     rapidjson::Value array(rapidjson::kArrayType);
 
     for (auto& val : values) {
