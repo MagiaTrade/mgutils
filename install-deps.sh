@@ -18,4 +18,12 @@ else
   git clone --branch v2.x git@github.com:catchorg/Catch2.git "$DIR/catch2"
 fi
 
+if [ -d "$DIR/onetbb" ]; then
+  echo "$DIR onetbb exists!"
+else
+  echo "$DIR Downloading onetbb:"
+  git clone git@github.com:oneapi-src/oneTBB.git "$DIR/onetbb"
+fi
+
+
 

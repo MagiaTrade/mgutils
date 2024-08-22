@@ -1,16 +1,19 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.23)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 project(mgutils)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(MGUTILS_BUILD_TESTS ON)
-set(MGUTILS_BUILD_EXAMPLES ON)
+option(MGUTILS_BUILD_TESTS "Build the tests" ON)
+option(MGUTILS_BUILD_EXAMPLES "Build the examples" ON)
 
 set(MG_UTILS_FILES
     include/mgutils/Logger.h
     src/Logger.cpp
     include/mgutils/Utils.h
     include/mgutils/ErrorManager.h
+    include/mgutils/JobPool.h
 )
 
 add_library(${PROJECT_NAME}  STATIC
@@ -43,6 +46,12 @@ else()
 endif()
 
 add_subdirectory(external/spdlog)
+
+# to honor the value before add the library #
+set(TBB_TEST OFF)                            #
+# ------------------------------------------ #
+add_subdirectory(external/oneTBB)
+
 ## External deps END -----------
 
 ## BOOST BEGIN -------------
@@ -68,10 +77,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog::spdlog_header_only
+    TBB::tbb
 )
 
 if (${MGUTILS_BUILD_TESTS})
-    add_subdirectory(tests)
+    add_subdirectory(docs)
 endif()
 
 if (${MGUTILS_BUILD_EXAMPLES})
