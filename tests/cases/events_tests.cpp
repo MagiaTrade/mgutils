@@ -94,7 +94,6 @@ TEST_CASE("EventManager multiple subscribers", "[EventManager]")
   }
 
   // Disconnect the subscribers to avoid interference with other tests
-  connection1.disconnect();
   connection2.disconnect();
 }
 

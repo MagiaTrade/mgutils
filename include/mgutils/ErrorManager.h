@@ -1,16 +1,8 @@
-//
-// Created by Arthur Motelevicz on 21/08/24.
-//
-
 #ifndef MGUTILS_ERRORMANAGER_H
 #define MGUTILS_ERRORMANAGER_H
 
 #include <boost/signals2.hpp>
-#include <boost/asio.hpp>
-#include <iostream>
 #include <functional>
-#include <string>
-#include <mutex>
 #include <string>
 
 namespace mgutils
@@ -39,13 +31,11 @@ namespace mgutils
 
     boost::signals2::connection subscribe(const std::function<void(const ErrorInfo& info)>& subscriber)
     {
-      std::lock_guard<std::mutex> lock(_mutex);
       return _errorSignal.connect(subscriber);
     }
 
     void notify(const ErrorInfo& info)
     {
-      std::lock_guard<std::mutex> lock(_mutex);
       _errorSignal(info);
     }
 
@@ -55,7 +45,6 @@ namespace mgutils
   private:
     ErrorManager() = default;
     ErrorSignal _errorSignal;
-    std::mutex _mutex;
   };
 }
 
