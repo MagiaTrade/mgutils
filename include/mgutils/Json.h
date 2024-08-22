@@ -34,27 +34,9 @@ namespace mgutils
   class JsonValue
   {
   public:
-    // Construtor que copia o valor de rapidjson::Value
-    JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator)
-        : _value(value, allocator), _allocator(allocator) {}
-
-    // Construtor que move o valor de rapidjson::Value
-    JsonValue(rapidjson::Value&& value, rapidjson::Document::AllocatorType& allocator)
-        : _value(std::move(value)), _allocator(allocator) {}
-
-
-    // Construtor de movimento
-    JsonValue(JsonValue&& other) noexcept
-        : _value(std::move(other._value)), _allocator(other._allocator) {}
-
-    // Implementação do operador de atribuição move
-    JsonValue& operator=(JsonValue&& other) noexcept {
-      if (this != &other) {
-        _value = std::move(other._value);  // Move o rapidjson::Value
-        _allocator = other._allocator;  // Copia o alocador
-      }
-      return *this;
-    }
+    JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(JsonValue&& other) noexcept;
+    JsonValue& operator=(JsonValue&& other) noexcept;
 
     explicit JsonValue(rapidjson::Document::AllocatorType& allocator);
     JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator);
