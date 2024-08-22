@@ -6,7 +6,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(MGUTILS_BUILD_TESTS ON)
 set(MGUTILS_BUILD_EXAMPLES ON)
 
-add_library(${PROJECT_NAME} INTERFACE)
+set(MG_UTILS_FILES
+    include/mgutils/Logger.h
+    src/Logger.cpp
+    include/mgutils/Utils.h
+)
+
+add_library(${PROJECT_NAME}  STATIC
+    ${MG_UTILS_FILES}
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
@@ -40,7 +48,7 @@ add_subdirectory(external/spdlog)
 find_package(Boost REQUIRED)
 
 if (${Boost_FOUND})
-    target_include_directories( ${PROJECT_NAME} INTERFACE
+    target_include_directories( ${PROJECT_NAME} PUBLIC
         ${Boost_INCLUDE_DIRS}
     )
 else()
@@ -49,11 +57,15 @@ endif()
 ## BOOST END -------------
 
 
-target_include_directories(${PROJECT_NAME} INTERFACE
+target_include_directories(${PROJECT_NAME} PUBLIC
     include
 )
 
-target_link_libraries(${PROJECT_NAME} INTERFACE
+target_include_directories(${PROJECT_NAME} PRIVATE
+    include/mgutils
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog::spdlog_header_only
 )
 

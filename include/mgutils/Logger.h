@@ -47,47 +47,39 @@ namespace mgutils
     Critical
   };
 
-  class Logger {
+
+  class Logger;
+
+  class LogMessage
+  {
   public:
-
-    static Logger& instance()
-    {
-      static Logger instance;
-      return instance;
-    }
-
-    void logStream(LogLevel level, const std::string& message)
-    {
-      log(level, message);
-    }
+    LogMessage(Logger& logger, LogLevel level);
+    ~LogMessage();
 
     template <typename T>
-    Logger& operator<<(const T& value)
+    LogMessage& operator<<(const T& value)
     {
       _stream << value;
-      flush();
       return *this;
     }
 
-    Logger& operator<<(LogLevel level)
-    {
-      logStream(level, _stream.str());
-      _stream.str("");
-      _stream.clear();
-      return *this;
-    }
+  private:
+    Logger& _logger;
+    LogLevel _level;
+    std::ostringstream _stream;
+  };
 
-    void flush() const
-    {
-      _traceLogger->flush();
-      _debugLogger->flush();
-      _infoLogger->flush();
-      _warningLogger->flush();
-      _errorLogger->flush();
-      _criticalLogger->flush();
-      _customLogger->flush();
-      _fileLogger->flush();
-    }
+  class Logger
+  {
+  public:
+
+    static Logger& instance();
+
+    LogMessage log(LogLevel level) ;
+
+    void logStream(LogLevel level, const std::string& message);
+
+    void flush() const;
 
     template<typename... Args>
     void log(LogLevel level, const std::string& format, Args&&... args)
@@ -158,116 +150,20 @@ namespace mgutils
     }
 
     // Set the global log level for the logger
-    void setLogLevel(LogLevel level)
-    {
-      switch (level)
-      {
-        case LogLevel::Trace:
-#ifdef DEBUG
-          spdlog::set_level(spdlog::level::trace);
-#else
-          spdlog::set_level(spdlog::level::info);
-#endif
-          break;
-        case LogLevel::Debug:
-#ifdef DEBUG
-          spdlog::set_level(spdlog::level::debug);
-#else
-          spdlog::set_level(spdlog::level::info);
-#endif
-          break;
-        case LogLevel::Info:
-          spdlog::set_level(spdlog::level::info);   // Enable logging at info level and above for all loggers
-          break;
-        case LogLevel::Warning:
-          spdlog::set_level(spdlog::level::warn);   // Enable logging at warning level and above for all loggers
-          break;
-        case LogLevel::Error:
-          spdlog::set_level(spdlog::level::err);    // Enable logging at error level and above for all loggers
-          break;
-        case LogLevel::Critical:
-          spdlog::set_level(spdlog::level::critical); // Enable logging at critical level only
-          break;
-        default:
-          break;
-      }
-    }
+    void setLogLevel(LogLevel level);
 
     // Cache the logging pattern and prepare preformatted patterns for each log level
-    void setPattern(const std::string& pattern, bool usesConsoleTag = true)
-    {
-      if(usesConsoleTag)
-        _cachedPattern = "%L: " + pattern;
-      else
-        _cachedPattern = pattern;
-
-      _tracePattern = TRACE_COLOR + _cachedPattern + RESET;
-      _debugPattern = DEBUG_COLOR + _cachedPattern + RESET;
-      _infoPattern = INFO_COLOR + _cachedPattern + RESET;
-      _warningPattern = WARNING_COLOR + _cachedPattern + RESET;
-      _errorPattern = ERROR_COLOR + _cachedPattern + RESET;
-      _criticalPattern = CRITICAL_COLOR + _cachedPattern + RESET;
-
-      _traceLogger->set_pattern(_tracePattern);
-      _debugLogger->set_pattern(_debugPattern);
-      _infoLogger->set_pattern(_infoPattern);
-      _warningLogger->set_pattern(_warningPattern);
-      _errorLogger->set_pattern(_errorPattern);
-      _criticalLogger->set_pattern(_criticalPattern);
-
-
-      _fileLogger->set_pattern(_cachedPattern);
-    }
+    void setPattern(const std::string& pattern, bool usesConsoleTag = true);
 
     // Add a file sink for logging to a file
-    void addFileSink(const std::string& filename)
-    {
-      auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
-      _fileLogger->sinks().push_back(file_sink);
-      _fileLogger->set_pattern(_cachedPattern);
-    }
+    void addFileSink(const std::string& filename);
 
     // Add a rotating file sink for logging to files with rotation based on size
-    void addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files)
-    {
-      auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
-      _fileLogger->sinks().push_back(rotating_sink);
-      _fileLogger->set_pattern(_cachedPattern);
-    }
+    void addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files);
 
-  private:
-    Logger()
-    {
-      try {
-        // Default log pattern
-        _cachedPattern = "[%Y-%m-%d %H:%M:%S.%f] [thread %t] %v";
-
-        _traceLogger = spdlog::stdout_color_mt("trace_logger");
-        _debugLogger = spdlog::stdout_color_mt("debug_logger");
-        _infoLogger = spdlog::stdout_color_mt("info_logger");
-        _warningLogger = spdlog::stdout_color_mt("warning_logger");
-        _errorLogger = spdlog::stdout_color_mt("error_logger");
-        _criticalLogger = spdlog::stdout_color_mt("critical_logger");
-        _customLogger = spdlog::stdout_color_mt("custom_logger");
-
-        //default log file. TODO:: think about this
-        _fileLogger = spdlog::basic_logger_mt("file_logger", "logs.txt");
-        setPattern(_cachedPattern);
-
-#ifdef DEBUG
-        spdlog::set_level(spdlog::level::trace);
-#else
-        spdlog::set_level(spdlog::level::info);
-#endif
-
-      } catch (const spdlog::spdlog_ex& ex) {
-        throw std::runtime_error("Failed to initialize logger: " + std::string(ex.what()));
-      } catch (const std::exception& ex) {
-        throw std::runtime_error("Unexpected error during logger initialization: " + std::string(ex.what()));
-      }
-    }
-
+    Logger();
     ~Logger() = default;
+  private:
 
     Logger(const Logger&) = delete; // Disable copy constructor
     Logger& operator=(const Logger&) = delete; // Disable assignment operator
@@ -290,10 +186,8 @@ namespace mgutils
     std::string _errorPattern;
     std::string _criticalPattern;
 
-    std::ostringstream _stream;  // To support <<
-
+    std::string _instanceId;
   };
-
 } // namespace mgutils
 
 #endif //MGUTILS_LOGGER_H
