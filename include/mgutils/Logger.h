@@ -77,6 +77,7 @@ namespace mgutils
 
     LogMessage log(LogLevel level) ;
 
+    std::string getLogFilename() const;
     void logStream(LogLevel level, const std::string& message);
 
     void flush() const;
@@ -163,10 +164,17 @@ namespace mgutils
 
     explicit Logger(const std::string& logFilename = "");
     ~Logger() = default;
-  private:
 
-    Logger(const Logger&) = delete; // Disable copy constructor
-    Logger& operator=(const Logger&) = delete; // Disable assignment operator
+    // Disable copy
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+
+    // Enable move
+    Logger(Logger&&) noexcept = default;
+    Logger& operator=(Logger&&) noexcept = default;
+
+  private:
+    std::string _logFileName;
 
     std::shared_ptr<spdlog::logger> _traceLogger;
     std::shared_ptr<spdlog::logger> _debugLogger;

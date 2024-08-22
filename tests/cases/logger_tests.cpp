@@ -327,4 +327,16 @@ TEST_CASE("Logger supports stream operator <<", "[logger][stream]")
   logFile.close();
 }
 
+TEST_CASE("Logger move", "[logger][move]")
+{
+  Logger logger1("custom_log.txt");
+  Logger logger2 = std::move(logger1);
+
+  REQUIRE(logger2.getLogFilename() == "custom_log.txt");
+
+  // Note: Accessing logger1 after move. This is for testing purposes only.
+  REQUIRE(logger1.getLogFilename().empty());
+}
+
+
 
