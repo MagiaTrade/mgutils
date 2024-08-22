@@ -12,6 +12,27 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include "ErrorManager.h"
+
+#define NOTIFY_ERROR(code, message)                                        \
+    do {                                                                   \
+        std::ostringstream oss;                                            \
+        oss << message << " (Error code: " << code                         \
+            << ", File: " << __FILE__ << ", Line: " << __LINE__ << ")";    \
+        Logger::instance().log(mgutils::LogLevel::Error, oss.str());       \
+        mgutils::ErrorInfo errorInfo(code, message, __FILE__, __LINE__);   \
+        mgutils::ErrorManager::instance().notify(errorInfo);               \
+    } while (0)
+
+#define NOTIFY_CRITICAL(code, message)                                     \
+    do {                                                                   \
+        std::ostringstream oss;                                            \
+        oss << message << " (Critical code: " << code                      \
+            << ", File: " << __FILE__ << ", Line: " << __LINE__ << ")";    \
+        Logger::instance().log(mgutils::LogLevel::Critical, oss.str());    \
+        mgutils::ErrorInfo errorInfo(code, message, __FILE__, __LINE__);   \
+        mgutils::ErrorManager::instance().notify(errorInfo);               \
+    } while (0)
 
 namespace mgutils
 {

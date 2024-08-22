@@ -327,6 +327,43 @@ TEST_CASE("Logger supports stream operator <<", "[logger][stream]")
   logFile.close();
 }
 
+TEST_CASE("Logger macros", "[logger][macros]")
+{
+  Logger::instance().setPattern("%v", true);
+  std::ifstream logFile("logs.txt");
+  std::string line;
+  std::string lastLogContent;
+
+  SECTION("ERROR")
+  {
+    NOTIFY_ERROR(404, "Page not found");
+    Logger::instance().flush();
+
+    REQUIRE(logFile.is_open());
+    while (std::getline(logFile, line)) {
+      lastLogContent = line;
+    }
+    REQUIRE(lastLogContent.find("Page not found") != std::string::npos);
+  }
+
+  SECTION("CRITICAL")
+  {
+    NOTIFY_CRITICAL(505, "Danger!");
+    Logger::instance().flush();
+
+    REQUIRE(logFile.is_open());
+
+    while (std::getline(logFile, line)){
+      lastLogContent = line;
+    }
+
+    REQUIRE(lastLogContent.find("Danger!") != std::string::npos);
+  }
+
+  logFile.close();
+}
+
+
 TEST_CASE("Logger move", "[logger][move]")
 {
   Logger logger1("custom_log.txt");

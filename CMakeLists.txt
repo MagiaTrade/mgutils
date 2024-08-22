@@ -10,6 +10,7 @@ set(MG_UTILS_FILES
     include/mgutils/Logger.h
     src/Logger.cpp
     include/mgutils/Utils.h
+    include/mgutils/ErrorManager.h
 )
 
 add_library(${PROJECT_NAME}  STATIC
