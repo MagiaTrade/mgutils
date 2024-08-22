@@ -34,17 +34,39 @@ namespace mgutils
   class JsonValue
   {
   public:
+    // Construtor que copia o valor de rapidjson::Value
+    JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator)
+        : _value(value, allocator), _allocator(allocator) {}
+
+    // Construtor que move o valor de rapidjson::Value
+    JsonValue(rapidjson::Value&& value, rapidjson::Document::AllocatorType& allocator)
+        : _value(std::move(value)), _allocator(allocator) {}
+
+
+    // Construtor de movimento
+    JsonValue(JsonValue&& other) noexcept
+        : _value(std::move(other._value)), _allocator(other._allocator) {}
+
+    // Implementação do operador de atribuição move
+    JsonValue& operator=(JsonValue&& other) noexcept {
+      if (this != &other) {
+        _value = std::move(other._value);  // Move o rapidjson::Value
+        _allocator = other._allocator;  // Copia o alocador
+      }
+      return *this;
+    }
+
     explicit JsonValue(rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(int value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(bool value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(uint value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(float value, rapidjson::Document::AllocatorType& allocator);
-    explicit JsonValue(double value, rapidjson::Document::AllocatorType& allocator);
-    
+    JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(int value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(bool value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(uint value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(float value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(double value, rapidjson::Document::AllocatorType& allocator);
+
     bool hasBool(const std::string& memberName) const;
     bool hasNumber(const std::string& memberName) const;
     bool hasString(const std::string& memberName) const;
@@ -73,7 +95,10 @@ namespace mgutils
     std::vector<JsonValue> getArray(const std::string& key) const;
 
     template <typename T>
-    JsonValue& set(const std::string& key, T value) {
+    JsonValue& set(const std::string& key, T& value)
+    {
+      using DecayedT = typename std::decay<T>::type;
+
       static_assert(std::is_same<T, bool>::value ||
                     std::is_same<T, int>::value ||
                     std::is_same<T, unsigned int>::value ||
@@ -82,7 +107,8 @@ namespace mgutils
                     std::is_same<T, float>::value ||
                     std::is_same<T, double>::value ||
                     std::is_same<T, std::string>::value ||
-                    std::is_same<T, const char*>::value,
+                    std::is_same<T, std::vector<JsonValue>>::value ||
+                    std::is_same<DecayedT, const char*>::value,
                     "Invalid type for set function");
 
       if constexpr (std::is_same<T, bool>::value) {
@@ -106,11 +132,64 @@ namespace mgutils
       } else if constexpr (std::is_same<T, double>::value) {
         // Implementar para double
         return setDouble(key, value);
-      } else if constexpr ( (std::is_same<T, const char*>::value) || (std::is_same<T, std::string>::value) ) {
+      }
+      else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
+        // Implementar para vector
+        return setVector(key, value);
+      } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
         // Implementar para string
         return setString(key, value);
       }
     }
+
+    template <typename T>
+    JsonValue& set(const std::string& key, T&& value)
+    {
+      using DecayedT = typename std::decay<T>::type;
+
+      static_assert(std::is_same<T, bool>::value ||
+                    std::is_same<T, int>::value ||
+                    std::is_same<T, unsigned int>::value ||
+                    std::is_same<T, int64_t>::value ||
+                    std::is_same<T, uint64_t>::value ||
+                    std::is_same<T, float>::value ||
+                    std::is_same<T, double>::value ||
+                    std::is_same<T, std::string>::value ||
+                    std::is_same<T, std::vector<JsonValue>>::value ||
+                    std::is_same<DecayedT, const char*>::value,
+                    "Invalid type for set function");
+
+      if constexpr (std::is_same<T, bool>::value) {
+        // Implementar para bool
+        return setBool(key, value);
+      } else if constexpr (std::is_same<T, int>::value) {
+        // Implementar para int
+        return setInt(key, value);
+      } else if constexpr (std::is_same<T, unsigned int>::value) {
+        // Implementar para unsigned int
+        return setUint(key, value);
+      } else if constexpr (std::is_same<T, int64_t>::value) {
+        // Implementar para int64_t
+        return setInt64(key, value);
+      } else if constexpr (std::is_same<T, uint64_t>::value) {
+        // Implementar para uint64_t
+        return setUint64(key, value);
+      } else if constexpr (std::is_same<T, float>::value) {
+        // Implementar para float
+        return setFloat(key, value);
+      } else if constexpr (std::is_same<T, double>::value) {
+        // Implementar para double
+        return setDouble(key, value);
+      }
+      else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
+        // Implementar para vector
+        return setVector(key, std::forward<T>(value));
+      } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
+        // Implementar para string
+        return setString(key, value);
+      }
+    }
+
 
     size_t size() const;
   private:
@@ -122,6 +201,9 @@ namespace mgutils
     JsonValue& setFloat(const std::string& key, float floatValue);
     JsonValue& setDouble(const std::string& key, double doubleValue);
     JsonValue& setString(const std::string& key, const std::string& stringValue);
+    JsonValue& setVector(const std::string& key, std::vector<JsonValue>& values);
+    JsonValue& setVector(const std::string& key, std::vector<JsonValue>&& values);
+
     rapidjson::Value _value;
     rapidjson::Document::AllocatorType& _allocator;
   };

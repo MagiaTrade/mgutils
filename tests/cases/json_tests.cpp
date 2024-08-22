@@ -45,6 +45,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
   SECTION("Parsing and accessing subobjects") {
     // Parse the JSON string
+
     bool success = Json::parse(jsonString, document);
     REQUIRE(success);
 
@@ -55,6 +56,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     JsonValue attributes = root.getObject("attributes");
 
     // Verify subobject contents
+    REQUIRE(root.getString("name") == std::optional<std::string>("Test Name"));
     REQUIRE(attributes.getInt("strength") == std::optional<int>(85));
     REQUIRE(attributes.getInt("dexterity") == std::optional<int>(90));
   }
@@ -146,12 +148,12 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
     // Verify that the array was created and is empty
     std::vector<JsonValue> items = root.getArray("items");
-    REQUIRE(items.size() == 0);
+    REQUIRE(items.empty());
 
     // Add items to the array
-    items.push_back(JsonValue("sword", document.getAllocator()));
-    items.push_back(JsonValue("shield", document.getAllocator()));
-    items.push_back(JsonValue("potion", document.getAllocator()));
+    items.emplace_back("sword", document.getAllocator());
+    items.emplace_back("shield", document.getAllocator());
+    items.emplace_back("potion", document.getAllocator());
 
     // Update the array in the document
     root.set("items", items);

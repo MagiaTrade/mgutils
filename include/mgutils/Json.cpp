@@ -22,11 +22,6 @@ namespace mgutils
     return _allocator;
   }
 
-  JsonValue JsonDocument::getRoot()
-  {
-    return JsonValue(_document, _allocator);
-  }
-
   bool Json::parse(const std::string& json, JsonDocument& document)
   {
     document.getDocument().Parse(json.c_str(), json.length());
@@ -81,8 +76,6 @@ namespace mgutils
   }
 
   // JSONValue -----------
-
-
   JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator)
   : _value(rapidjson::kNullType), _allocator(allocator) {}
 
@@ -138,6 +131,11 @@ namespace mgutils
   : _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetDouble(value);
+  }
+
+  JsonValue JsonDocument::getRoot()
+  {
+    return JsonValue(_document, _allocator);
   }
 
   bool JsonValue::hasBool(const std::string& memberName) const {
@@ -222,10 +220,11 @@ namespace mgutils
 
   JsonValue JsonValue::getObject(const std::string& key) const {
     if (_value.HasMember(key.c_str()) && _value[key.c_str()].IsObject()) {
+      // Aqui, retornamos o JsonValue com o objeto associado à chave
       return JsonValue(_value[key.c_str()], _allocator);
     }
-    // You may want to throw an exception or handle the error appropriately
-    return JsonValue(_value, _allocator); // Returning a default value
+    // Caso contrário, lance uma exceção ou retorne um JsonValue inválido, conforme necessário
+    throw std::runtime_error("Key not found or not an object");
   }
 
   std::vector<JsonValue> JsonValue::getArray(const std::string& key) const {
@@ -236,6 +235,49 @@ namespace mgutils
       }
     }
     return values;
+  }
+
+  JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>& values)
+  {
+    if (!_value.IsObject()) {
+      _value.SetObject();
+    }
+
+    rapidjson::Value array(rapidjson::kArrayType);
+    for (auto& val : values) {
+      array.PushBack(val._value, _allocator);
+    }
+
+    if (_value.HasMember(key.c_str())) {
+      _value[key.c_str()] = array;
+    } else {
+      rapidjson::Value name(key.c_str(), _allocator);
+      _value.AddMember(name, array, _allocator);
+    }
+
+    return *this;
+  }
+
+  JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>&& values)
+  {
+    if (!_value.IsObject()) {
+      _value.SetObject();
+    }
+
+    rapidjson::Value array(rapidjson::kArrayType);
+
+    for (auto& val : values) {
+      array.PushBack(val._value, _allocator);
+    }
+
+    if (_value.HasMember(key.c_str())) {
+      _value[key.c_str()] = array;
+    } else {
+      rapidjson::Value name(key.c_str(), _allocator);
+      _value.AddMember(name, array, _allocator);
+    }
+
+    return *this;
   }
 
   JsonValue& JsonValue::setBool(const std::string& key, bool boolValue)
