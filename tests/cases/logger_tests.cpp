@@ -5,7 +5,6 @@
 #include <mgutils/Logger.h>
 #include <fstream>
 #include <iostream>
-
 #include <sys/stat.h>
 
 using namespace mgutils;
