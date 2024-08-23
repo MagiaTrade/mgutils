@@ -164,6 +164,20 @@ namespace mgutils
     return std::nullopt;
   }
 
+  bool JsonValue::isNull()
+  {
+    return _value.IsNull();
+  }
+
+  bool JsonValue::isEmpty()
+  {
+    if (_value.IsObject()) {
+      return _value.ObjectEmpty();
+    } else if (_value.IsArray()) {
+      return _value.Empty();
+    }
+  }
+
   JsonValue JsonValue::getObject(const std::string& key) const
   {
     if (_value[key.c_str()].IsObject() && _value.HasMember(key.c_str()))
@@ -171,6 +185,22 @@ namespace mgutils
       return {_value[key.c_str()], _allocator};
     }
     throw std::runtime_error("Key not found or not an object");
+  }
+
+
+
+  std::vector<JsonValue> JsonValue::getArray() const
+  {
+    std::vector<JsonValue> values;
+    if (_value.IsArray())
+    {
+      for (auto& v : _value.GetArray())
+      {
+        values.emplace_back(v, _allocator);
+      }
+      return values;
+    }
+    throw std::runtime_error("JsonValue is not an array");
   }
 
   std::vector<JsonValue> JsonValue::getArray(const std::string& key) const
@@ -185,6 +215,20 @@ namespace mgutils
       return values;
     }
     throw std::runtime_error("Key not found or not an array");
+  }
+
+  JsonValue& JsonValue::setObject(const std::string& key, const JsonValue& objectValue)
+  {
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    if (_value.HasMember(key.c_str())) {
+      _value[key.c_str()] = obj;
+    } else {
+      rapidjson::Value name(key.c_str(), _allocator);
+      _value.AddMember(name, obj, _allocator);
+    }
+
+    return *this;
   }
 
   JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>& values)

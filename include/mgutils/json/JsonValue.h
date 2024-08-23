@@ -53,8 +53,12 @@ namespace mgutils
     std::optional<double> asUint() const;
     std::optional<double> asUint64() const;
 
+    bool isNull();
+    bool isEmpty();
+
     JsonValue getObject(const std::string& key) const;
     std::vector<JsonValue> getArray(const std::string& key) const;
+    std::vector<JsonValue> getArray() const;
 
     template <typename T>
     JsonValue& set(const std::string& key, T& value)
@@ -70,6 +74,7 @@ namespace mgutils
                     std::is_same<T, double>::value ||
                     std::is_same<T, std::string>::value ||
                     std::is_same<T, std::vector<JsonValue>>::value ||
+                    std::is_same<T, JsonValue>::value ||
                     std::is_same<DecayedT, const char*>::value,
                     "Invalid type for set function");
 
@@ -91,6 +96,8 @@ namespace mgutils
         return setFloat(key, value);
       } else if constexpr (std::is_same<T, double>::value) {
         return setDouble(key, value);
+      }else if constexpr (std::is_same<T, JsonValue>::value) {
+        return setObject(key, value);
       }else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
         return setVector(key, value);
       } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
@@ -112,6 +119,7 @@ namespace mgutils
                     std::is_same<T, double>::value ||
                     std::is_same<T, std::string>::value ||
                     std::is_same<T, std::vector<JsonValue>>::value ||
+                    std::is_same<T, JsonValue>::value ||
                     std::is_same<DecayedT, const char*>::value,
                     "Invalid type for set function");
 
@@ -133,6 +141,8 @@ namespace mgutils
         return setFloat(key, value);
       } else if constexpr (std::is_same<T, double>::value) {
         return setDouble(key, value);
+      } else if constexpr (std::is_same<T, JsonValue>::value) {
+        return setObject(key, value);
       }else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
         return setVector(key, std::forward<T>(value));
       } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
@@ -151,6 +161,7 @@ namespace mgutils
     JsonValue& setFloat(const std::string& key, float floatValue);
     JsonValue& setDouble(const std::string& key, double doubleValue);
     JsonValue& setString(const std::string& key, const std::string& stringValue);
+    JsonValue& setObject(const std::string& key, const JsonValue& objectValue);
     JsonValue& setVector(const std::string& key, std::vector<JsonValue>& values);
     JsonValue& setVector(const std::string& key, std::vector<JsonValue>&& values);
 

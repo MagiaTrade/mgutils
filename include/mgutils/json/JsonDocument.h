@@ -23,19 +23,20 @@ namespace mgutils
   class JsonDocument
   {
   public:
-    rapidjson::Document& getDocument();  // Non-const, allowing modifications
-    rapidjson::Document::AllocatorType& getAllocator();
-
     JsonValue getRoot();  // To get the root object
-
+    rapidjson::Document::AllocatorType& getAllocator();
     // Serialization
     std::string toString(bool pretty = false);
     bool save(const std::string& file);
+    bool isArray();
+    bool isObject();
 
     friend class Json;
 
   private:
     JsonDocument();
+    void setObjet();
+    void setArray();
     rapidjson::Document _document;
     rapidjson::Document::AllocatorType& _allocator;
   };

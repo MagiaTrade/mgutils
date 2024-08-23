@@ -5,15 +5,31 @@
 
 namespace mgutils
 {
-  std::shared_ptr<JsonDocument> Json::createDocument()
+  std::shared_ptr<JsonDocument> Json::createDocument(JsonRootType type)
   {
-    return std::shared_ptr<JsonDocument>(new JsonDocument());
+    std::shared_ptr<JsonDocument> document(new JsonDocument());
+    switch (type)
+    {
+      case JsonRootType::OBJECT:
+      {
+        document->setObjet();
+        break;
+      }
+      case JsonRootType::ARRAY:
+      {
+        document->setArray();
+        break;
+      }
+      default:
+        break;
+    }
+    return document;
   }
 
   std::shared_ptr<JsonDocument> Json::parse(const std::string& json)
   {
     std::shared_ptr<JsonDocument> document(new JsonDocument());
-    document->getDocument().Parse(json.c_str(), json.length());
+    document->_document.Parse(json.c_str(), json.length());
     return document;
   }
 
@@ -28,7 +44,7 @@ namespace mgutils
 
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-    document->getDocument().ParseStream(is);
+    document->_document.ParseStream(is);
     fclose(fp);
   }
 

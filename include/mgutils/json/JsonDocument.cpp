@@ -14,11 +14,6 @@ namespace mgutils
       _allocator(_document.GetAllocator())
   {}
 
-  rapidjson::Document& JsonDocument::getDocument()
-  {
-    return _document;
-  }
-
   rapidjson::Document::AllocatorType& JsonDocument::getAllocator()
   {
     return _allocator;
@@ -29,10 +24,10 @@ namespace mgutils
     rapidjson::StringBuffer buffer;
     if (pretty) {
       rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-      getDocument().Accept(writer);
+      _document.Accept(writer);
     } else {
       rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-      getDocument().Accept(writer);
+      _document.Accept(writer);
     }
     return buffer.GetString();
   }
@@ -46,10 +41,29 @@ namespace mgutils
     char writeBuffer[65536];
     rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
     rapidjson::Writer<rapidjson::FileWriteStream> writer(os);
-    getDocument().Accept(writer);
+    _document.Accept(writer);
     fclose(fp);
 
     return true;
   }
 
+  void JsonDocument::setObjet()
+  {
+    _document.SetObject();
+  }
+
+  void JsonDocument::setArray()
+  {
+    _document.SetArray();
+  }
+
+  bool  JsonDocument::isArray()
+  {
+    return _document.IsArray();
+  }
+
+  bool  JsonDocument::isObject()
+  {
+    return _document.IsObject();
+  }
 }

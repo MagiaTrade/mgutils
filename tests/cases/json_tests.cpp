@@ -3,7 +3,53 @@
 
 using namespace mgutils;
 
-TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]") {
+TEST_CASE("JSON parse array content", "[parse, array]")
+{
+  const std::string jsonArrayString = R"([
+    "oi",
+    10,
+    true,
+    {
+      "key1": 10
+    },
+    30.5,
+    {},
+    [],
+    null
+    ])";
+
+  auto arrDoc = Json::parse(jsonArrayString);
+
+  REQUIRE(arrDoc->isArray());
+
+  JsonValue root = arrDoc->getRoot();
+  std::vector<JsonValue> items = root.getArray();
+
+  REQUIRE(items.size() == 8);
+  REQUIRE(items[0].asString() == std::optional<std::string>("oi"));
+  REQUIRE(items[1].asInt() == std::optional<int>(10));
+  REQUIRE(items[2].asBool() == std::optional<bool>(true));
+  REQUIRE(items[3].getInt("key1") == std::optional<int>(10));
+  REQUIRE(items[4].asDouble() == std::optional<double>(30.5));
+  REQUIRE(items[5].isEmpty());
+  REQUIRE(items[6].isEmpty());
+  REQUIRE(items[7].isNull());
+}
+
+TEST_CASE("JsonValue set transform")
+{
+  auto doc =  Json::createDocument();
+  JsonValue jsonValue = JsonValue("testValue", doc->getAllocator());
+
+  REQUIRE(jsonValue.asString() == std::optional<std::string>("testValue"));
+
+  jsonValue.set("testkey", "New valor");
+
+  REQUIRE(jsonValue.getString("testkey") == std::optional<std::string>("New valor"));
+}
+
+TEST_CASE("JSON parsing and manipulation", "[JsonDocument]")
+{
   // Test JSON string
   const std::string jsonString = R"({
         "name": "Test Name",
@@ -42,6 +88,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(root.getInt64("id") == std::optional<int64_t>(1234567890123456789));
     REQUIRE(root.getUint("unsignedId") == std::optional<unsigned int>(987654321));
   }
+
 
   SECTION("Accessing subobjects")
   {
@@ -125,7 +172,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(root.getUint("unsignedId") == std::optional<unsigned int>(123456789u));
   }
 
-  SECTION("Creating and manipulating arrays in JSON") {
+  SECTION("Creating and manipulating arrays in JSON")
+  {
     // Create a new empty JSON document
     auto doc =  Json::createDocument();
     JsonValue root = doc->getRoot();
@@ -142,7 +190,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     items.emplace_back("shield", doc->getAllocator());
     items.emplace_back("potion", doc->getAllocator());
 
-    // Update the array in the document
+    // Update
     root.set("items", items);
 
     // Verify that the items were added correctly
@@ -175,14 +223,31 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
   }
 }
 
-TEST_CASE("JsonValue set transform")
+TEST_CASE("JSON create different roots", "[object, array]")
 {
-  auto doc =  Json::createDocument();
-  JsonValue jsonValue = JsonValue("testValue", doc->getAllocator());
+  auto doc = Json::createDocument(JsonRootType::OBJECT);
+  REQUIRE(doc->isObject());
 
-  REQUIRE(jsonValue.asString() == std::optional<std::string>("testValue"));
-
-  jsonValue.set("testkey", "New valor");
-
-  REQUIRE(jsonValue.getString("testkey") == std::optional<std::string>("New valor"));
+  auto arrDoc = Json::createDocument(JsonRootType::ARRAY);
+  REQUIRE(arrDoc->isArray());
 }
+
+TEST_CASE("JSON parse object content", "[parse, object]")
+{
+  const std::string jsonString = R"({
+        "name": "John Doe",
+        "age": 30,
+        "isActive": true
+    })";
+
+  auto doc = Json::parse(jsonString);
+
+  REQUIRE(doc->isObject());
+
+  JsonValue root = doc->getRoot();
+
+  REQUIRE(root.getString("name") == std::optional<std::string>("John Doe"));
+  REQUIRE(root.getInt("age") == std::optional<int>(30));
+  REQUIRE(root.getBool("isActive") == std::optional<bool>(true));
+}
+
