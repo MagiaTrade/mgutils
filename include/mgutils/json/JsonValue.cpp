@@ -177,6 +177,8 @@ namespace mgutils
     } else if (_value.IsArray()) {
       return _value.Empty();
     }
+
+    return false;
   }
 
   JsonValue JsonValue::getObject(const std::string& key) const
@@ -185,7 +187,11 @@ namespace mgutils
     {
       return {_value[key.c_str()], _allocator};
     }
+
     throw std::runtime_error("Key not found or not an object");
+
+    // return to avoid warning only
+    return {_value,_allocator};
   }
 
 
