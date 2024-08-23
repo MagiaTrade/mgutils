@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include "mgutils/json/Json.h"
+#include "mgutils/Json.h"
 
 using namespace mgutils;
 

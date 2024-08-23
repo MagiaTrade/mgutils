@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "rapidjson/document.h"
-#include "mgutils/json/Json.h"
+#include <mgutils/Json.h>
 
 using namespace std::chrono;
 
@@ -13,11 +13,13 @@ void benchmarkRapidJson(const std::string& jsonString)
 {
   auto start = high_resolution_clock::now();
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     rapidjson::Document document;
     document.Parse(jsonString.c_str());
     auto name = document["name"].GetString();
     auto age = document["age"].GetInt();
+    auto active = document["isActive"].GetBool();
+    auto height = document["height"].GetDouble();
   }
 
   auto end = high_resolution_clock::now();
@@ -30,11 +32,13 @@ void benchmarkJsonWrapper(const std::string& jsonString)
 {
   auto start = high_resolution_clock::now();
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     auto document = mgutils::Json::parse(jsonString);
     auto root = document->getRoot();
     auto name = root.getString("name");
     auto age = root.getInt("age");
+    auto active = root.getBool("isActive");
+    auto height = root.getDouble("height");
   }
 
   auto end = high_resolution_clock::now();

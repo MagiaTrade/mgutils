@@ -14,8 +14,8 @@ set(MG_UTILS_FILES
     include/mgutils/Utils.h
     include/mgutils/ErrorManager.h
     include/mgutils/JobPool.h
-        include/mgutils/json/Json.cpp include/mgutils/json/Json.h
-        include/mgutils/json/Json.cpp include/mgutils/json/Json.cpp
+        include/mgutils/Json.cpp include/mgutils/Json.h
+        include/mgutils/Json.cpp include/mgutils/Json.cpp
         include/mgutils/json/JsonDocument.cpp include/mgutils/json/JsonDocument.h include/mgutils/json/JsonValue.cpp include/mgutils/json/JsonValue.h)
 
 add_library(${PROJECT_NAME}  STATIC
