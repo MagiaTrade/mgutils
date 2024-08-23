@@ -251,3 +251,31 @@ TEST_CASE("JSON parse object content", "[parse, object]")
   REQUIRE(root.getBool("isActive") == std::optional<bool>(true));
 }
 
+TEST_CASE("JSON parse and insert nested object", "[parse, object, nested]")
+{
+  const std::string jsonString = R"({
+        "name": "John Doe",
+        "age": 30,
+        "isActive": true
+    })";
+
+  auto doc = Json::parse(jsonString);
+  REQUIRE(doc->isObject());
+
+  JsonValue root = doc->getRoot();
+
+  REQUIRE(root.getString("name") == std::optional<std::string>("John Doe"));
+  REQUIRE(root.getInt("age") == std::optional<int>(30));
+  REQUIRE(root.getBool("isActive") == std::optional<bool>(true));
+
+  JsonValue newObject(doc);
+  newObject.set("key1", "value1");
+  newObject.set("key2", 42);
+
+  root.set("newObject", newObject);
+
+  JsonValue nestedObject = root.getObject("newObject");
+  REQUIRE(nestedObject.getString("key1") == std::optional<std::string>("value1"));
+  REQUIRE(nestedObject.getInt("key2") == std::optional<int>(42));
+}
+

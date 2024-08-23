@@ -226,7 +226,7 @@ namespace mgutils
 
   JsonValue& JsonValue::setObject(const std::string& key, const JsonValue& objectValue)
   {
-    rapidjson::Value obj(rapidjson::kObjectType);
+    rapidjson::Value obj(objectValue._value, _allocator);
 
     if (_value.HasMember(key.c_str())) {
       _value[key.c_str()] = obj;
