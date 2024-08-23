@@ -3,9 +3,15 @@
 //
 
 #include "JsonValue.h"
+#include "JsonDocument.h"
 
 namespace mgutils
 {
+
+  //private
+  JsonValue::JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator):
+      _value(value, allocator),_allocator(allocator) {}
+
   // Movement constructor
   JsonValue::JsonValue(JsonValue&& other) noexcept:
       _value(std::move(other._value)), _allocator(other._allocator){}
@@ -19,69 +25,64 @@ namespace mgutils
     return *this;
   }
 
-  JsonValue::JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator):
-      _value(value, allocator),_allocator(allocator) {}
+  JsonValue::JsonValue(const rapidjson::Value& value, const std::shared_ptr<JsonDocument>& doc):
+      _value(value, doc->getAllocator()),_allocator(doc->getAllocator()) {}
 
-  JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNullType), _allocator(allocator) {}
+  JsonValue::JsonValue(const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNullType), _allocator(doc->getAllocator()) {}
 
-  JsonValue::JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kStringType), _allocator(allocator)
+  JsonValue::JsonValue(const std::string& value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kStringType), _allocator(doc->getAllocator())
   {
-    _value.SetString(value.c_str(), allocator);
+    _value.SetString(value.c_str(), doc->getAllocator());
   }
 
-  JsonValue::JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kStringType), _allocator(allocator)
+  JsonValue::JsonValue(const char* value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kStringType), _allocator(doc->getAllocator())
   {
-    _value.SetString(value, allocator);
+    _value.SetString(value, doc->getAllocator());
   }
 
-  JsonValue::JsonValue(bool value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kFalseType), _allocator(allocator)
+  JsonValue::JsonValue(bool value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kFalseType), _allocator(doc->getAllocator())
   {
     _value.SetBool(value);
   }
 
-  JsonValue::JsonValue(int value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(int value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetInt(value);
   }
 
-  JsonValue::JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(int64_t value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetInt64(value);
   }
 
-  JsonValue::JsonValue(uint value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(uint value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetUint(value);
   }
 
-  JsonValue::JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(uint64_t value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetUint64(value);
   }
 
-  JsonValue::JsonValue(float value, rapidjson::Document::AllocatorType& allocator)
-      : _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(float value, const std::shared_ptr<JsonDocument>& doc)
+      : _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetFloat(value);
   }
 
-  JsonValue::JsonValue(double value, rapidjson::Document::AllocatorType& allocator):
-      _value(rapidjson::kNumberType), _allocator(allocator)
+  JsonValue::JsonValue(double value, const std::shared_ptr<JsonDocument>& doc):
+      _value(rapidjson::kNumberType), _allocator(doc->getAllocator())
   {
     _value.SetDouble(value);
-  }
-
-  JsonValue JsonDocument::getRoot()
-  {
-    return {_document, _allocator};
   }
 
   bool JsonValue::hasBool(const std::string& memberName) const {
@@ -196,7 +197,7 @@ namespace mgutils
     {
       for (auto& v : _value.GetArray())
       {
-        values.emplace_back(v, _allocator);
+        values.push_back(JsonValue(v, _allocator));
       }
       return values;
     }
@@ -210,7 +211,7 @@ namespace mgutils
     {
       for (auto& v : _value[key.c_str()].GetArray())
       {
-        values.emplace_back(v, _allocator);
+        values.push_back(JsonValue(v, _allocator));
       }
       return values;
     }

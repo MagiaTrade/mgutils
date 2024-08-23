@@ -5,28 +5,38 @@
 #ifndef MGUTILS_JSONVALUE_H
 #define MGUTILS_JSONVALUE_H
 
-
-#include "JsonDocument.h"
+#include "rapidjson/document.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+#include <fstream>
+#include <optional>
+#include <string>
+#include <vector>
+#include <type_traits>
 
 namespace mgutils
 {
+  class JsonDocument;
+
   class JsonValue
   {
   public:
-    JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator);
+    JsonValue(const rapidjson::Value& value, const std::shared_ptr<JsonDocument>& doc);
     JsonValue(JsonValue&& other) noexcept;
     JsonValue& operator=(JsonValue&& other) noexcept;
 
-    explicit JsonValue(rapidjson::Document::AllocatorType& allocator);
-    JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(int value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(bool value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(uint value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(float value, rapidjson::Document::AllocatorType& allocator);
-    JsonValue(double value, rapidjson::Document::AllocatorType& allocator);
+    explicit JsonValue(const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(const std::string& value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(const char* value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(int value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(bool value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(int64_t value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(uint value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(uint64_t value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(float value, const std::shared_ptr<JsonDocument>& doc);
+    JsonValue(double value, const std::shared_ptr<JsonDocument>& doc);
 
     bool hasBool(const std::string& memberName) const;
     bool hasNumber(const std::string& memberName) const;
@@ -153,6 +163,9 @@ namespace mgutils
     size_t size() const;
 
   private:
+
+    JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator);
+
     JsonValue& setBool(const std::string& key, bool boolValue);
     JsonValue& setInt(const std::string& key, int intValue);
     JsonValue& setUint(const std::string& key, unsigned int unsignedValue);

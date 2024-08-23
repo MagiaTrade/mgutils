@@ -6,6 +6,7 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "JsonValue.h"
 
 namespace mgutils
 {
@@ -45,6 +46,11 @@ namespace mgutils
     fclose(fp);
 
     return true;
+  }
+
+  JsonValue JsonDocument::getRoot()
+  {
+    return {_document, shared_from_this()};
   }
 
   void JsonDocument::setObjet()

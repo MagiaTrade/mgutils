@@ -20,7 +20,7 @@ namespace mgutils
 {
   class JsonValue; // Forward declaration
 
-  class JsonDocument
+  class JsonDocument: public std::enable_shared_from_this<JsonDocument>
   {
   public:
     JsonValue getRoot();  // To get the root object

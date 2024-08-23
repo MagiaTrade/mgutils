@@ -39,7 +39,7 @@ TEST_CASE("JSON parse array content", "[parse, array]")
 TEST_CASE("JsonValue set transform")
 {
   auto doc =  Json::createDocument();
-  JsonValue jsonValue = JsonValue("testValue", doc->getAllocator());
+  JsonValue jsonValue = JsonValue("testValue", doc);
 
   REQUIRE(jsonValue.asString() == std::optional<std::string>("testValue"));
 
@@ -186,9 +186,9 @@ TEST_CASE("JSON parsing and manipulation", "[JsonDocument]")
     REQUIRE(items.empty());
 
     // Add items to the array
-    items.emplace_back("sword", doc->getAllocator());
-    items.emplace_back("shield", doc->getAllocator());
-    items.emplace_back("potion", doc->getAllocator());
+    items.emplace_back("sword", doc);
+    items.emplace_back("shield", doc);
+    items.emplace_back("potion", doc);
 
     // Update
     root.set("items", items);
@@ -201,7 +201,7 @@ TEST_CASE("JSON parsing and manipulation", "[JsonDocument]")
     REQUIRE(items[2].asString() == std::optional<std::string>("potion"));
 
     // Modify an item within the array
-    items[1] = JsonValue("armor", doc->getAllocator());
+    items[1] = JsonValue("armor", doc);
     root.set("items", items);
 
     // Verify that the item was modified correctly
@@ -211,8 +211,8 @@ TEST_CASE("JSON parsing and manipulation", "[JsonDocument]")
 
     // Test adding a new array as a value (nested array)
     std::vector<JsonValue> nestedArray;
-    nestedArray.push_back(JsonValue("nested1", doc->getAllocator()));
-    nestedArray.push_back(JsonValue("nested2", doc->getAllocator()));
+    nestedArray.push_back(JsonValue("nested1", doc));
+    nestedArray.push_back(JsonValue("nested2", doc));
     root.set("nestedArray", nestedArray);
 
     // Verify the contents of the nested array
