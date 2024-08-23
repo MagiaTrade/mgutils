@@ -10,6 +10,17 @@
 #include <random>
 #include <sstream>
 #include <iomanip>
+#include <limits>
+#include <cstdint>
+
+#define fNaN (std::numeric_limits<float>::quiet_NaN())
+#define dNaN (std::numeric_limits<double>::quiet_NaN())
+
+#define INVALID_INT (std::numeric_limits<int>::min())
+#define INVALID_INT8 (std::numeric_limits<int8_t>::min())
+#define INVALID_INT16 (std::numeric_limits<int16_t>::min())
+#define INVALID_INT32 (std::numeric_limits<int32_t>::min())
+#define INVALID_INT64 (std::numeric_limits<int64_t>::min())
 
 namespace mgutils
 {
