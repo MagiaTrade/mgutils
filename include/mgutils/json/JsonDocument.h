@@ -23,8 +23,6 @@ namespace mgutils
   class JsonDocument
   {
   public:
-    JsonDocument();
-
     rapidjson::Document& getDocument();  // Non-const, allowing modifications
     rapidjson::Document::AllocatorType& getAllocator();
 
@@ -34,7 +32,10 @@ namespace mgutils
     std::string toString(bool pretty = false);
     bool save(const std::string& file);
 
+    friend class Json;
+
   private:
+    JsonDocument();
     rapidjson::Document _document;
     rapidjson::Document::AllocatorType& _allocator;
   };

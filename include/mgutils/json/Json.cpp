@@ -5,16 +5,21 @@
 
 namespace mgutils
 {
+  std::shared_ptr<JsonDocument> Json::createDocument()
+  {
+    return std::shared_ptr<JsonDocument>(new JsonDocument());
+  }
+
   std::shared_ptr<JsonDocument> Json::parse(const std::string& json)
   {
-    auto document = std::make_shared<JsonDocument>();
+    std::shared_ptr<JsonDocument> document(new JsonDocument());
     document->getDocument().Parse(json.c_str(), json.length());
     return document;
   }
 
   std::shared_ptr<JsonDocument> Json::parseFile(const std::string& filePath)
   {
-    auto document = std::make_shared<JsonDocument>();
+    std::shared_ptr<JsonDocument> document(new JsonDocument());
 
     FILE* fp = fopen(filePath.c_str(), "r");
     if (!fp) {

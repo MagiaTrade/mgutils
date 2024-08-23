@@ -127,8 +127,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
   SECTION("Creating and manipulating arrays in JSON") {
     // Create a new empty JSON document
-    JsonDocument doc;
-    JsonValue root = doc.getRoot();
+    auto doc =  Json::createDocument();
+    JsonValue root = doc->getRoot();
 
     // Define an empty array
     root.set("items", std::vector<JsonValue>());
@@ -138,9 +138,9 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(items.empty());
 
     // Add items to the array
-    items.emplace_back("sword", doc.getAllocator());
-    items.emplace_back("shield", doc.getAllocator());
-    items.emplace_back("potion", doc.getAllocator());
+    items.emplace_back("sword", doc->getAllocator());
+    items.emplace_back("shield", doc->getAllocator());
+    items.emplace_back("potion", doc->getAllocator());
 
     // Update the array in the document
     root.set("items", items);
@@ -153,7 +153,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(items[2].asString() == std::optional<std::string>("potion"));
 
     // Modify an item within the array
-    items[1] = JsonValue("armor", doc.getAllocator());
+    items[1] = JsonValue("armor", doc->getAllocator());
     root.set("items", items);
 
     // Verify that the item was modified correctly
@@ -163,8 +163,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
     // Test adding a new array as a value (nested array)
     std::vector<JsonValue> nestedArray;
-    nestedArray.push_back(JsonValue("nested1", doc.getAllocator()));
-    nestedArray.push_back(JsonValue("nested2", doc.getAllocator()));
+    nestedArray.push_back(JsonValue("nested1", doc->getAllocator()));
+    nestedArray.push_back(JsonValue("nested2", doc->getAllocator()));
     root.set("nestedArray", nestedArray);
 
     // Verify the contents of the nested array
@@ -177,8 +177,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
 TEST_CASE("JsonValue set transform")
 {
-  JsonDocument document;
-  JsonValue jsonValue = JsonValue("testValue", document.getAllocator());
+  auto doc =  Json::createDocument();
+  JsonValue jsonValue = JsonValue("testValue", doc->getAllocator());
 
   REQUIRE(jsonValue.asString() == std::optional<std::string>("testValue"));
 
