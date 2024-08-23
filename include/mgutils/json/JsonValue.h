@@ -1,36 +1,15 @@
-#ifndef MGUTILS_JSON_H
-#define MGUTILS_JSON_H
+//
+// Created by Arthur Motelevicz on 23/08/24.
+//
 
-#include <rapidjson/document.h>
-#include <rapidjson/filewritestream.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-#include <fstream>
-#include <optional>
-#include <string>
-#include <vector>
-#include <type_traits>
+#ifndef MGUTILS_JSONVALUE_H
+#define MGUTILS_JSONVALUE_H
+
+
+#include "JsonDocument.h"
 
 namespace mgutils
 {
-  class JsonValue; // Forward declaration
-
-  class JsonDocument
-  {
-  public:
-    JsonDocument();
-
-    rapidjson::Document& getDocument();  // Non-const, allowing modifications
-    rapidjson::Document::AllocatorType& getAllocator();
-
-    JsonValue getRoot();  // To get the root object
-
-  private:
-    rapidjson::Document _document;
-    rapidjson::Document::AllocatorType& _allocator;
-  };
-
   class JsonValue
   {
   public:
@@ -66,6 +45,7 @@ namespace mgutils
     std::optional<double> getDouble(const std::string& key) const;
 
     std::optional<std::string> asString() const;
+
     std::optional<int> asInt() const;
     std::optional<bool> asBool() const;
     std::optional<float> asFloat() const;
@@ -98,32 +78,22 @@ namespace mgutils
       }
 
       if constexpr (std::is_same<T, bool>::value) {
-        // Implementar para bool
         return setBool(key, value);
       } else if constexpr (std::is_same<T, int>::value) {
-        // Implementar para int
         return setInt(key, value);
       } else if constexpr (std::is_same<T, unsigned int>::value) {
-        // Implementar para unsigned int
         return setUint(key, value);
       } else if constexpr (std::is_same<T, int64_t>::value) {
-        // Implementar para int64_t
         return setInt64(key, value);
       } else if constexpr (std::is_same<T, uint64_t>::value) {
-        // Implementar para uint64_t
         return setUint64(key, value);
       } else if constexpr (std::is_same<T, float>::value) {
-        // Implementar para float
         return setFloat(key, value);
       } else if constexpr (std::is_same<T, double>::value) {
-        // Implementar para double
         return setDouble(key, value);
-      }
-      else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
-        // Implementar para vector
+      }else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
         return setVector(key, value);
       } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
-        // Implementar para string
         return setString(key, value);
       }
     }
@@ -150,38 +120,28 @@ namespace mgutils
       }
 
       if constexpr (std::is_same<T, bool>::value) {
-        // Implementar para bool
         return setBool(key, value);
       } else if constexpr (std::is_same<T, int>::value) {
-        // Implementar para int
         return setInt(key, value);
       } else if constexpr (std::is_same<T, unsigned int>::value) {
-        // Implementar para unsigned int
         return setUint(key, value);
       } else if constexpr (std::is_same<T, int64_t>::value) {
-        // Implementar para int64_t
         return setInt64(key, value);
       } else if constexpr (std::is_same<T, uint64_t>::value) {
-        // Implementar para uint64_t
         return setUint64(key, value);
       } else if constexpr (std::is_same<T, float>::value) {
-        // Implementar para float
         return setFloat(key, value);
       } else if constexpr (std::is_same<T, double>::value) {
-        // Implementar para double
         return setDouble(key, value);
-      }
-      else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
-        // Implementar para vector
+      }else if constexpr (std::is_same<T, std::vector<JsonValue>>::value) {
         return setVector(key, std::forward<T>(value));
       } else if constexpr ( (std::is_same<DecayedT, const char*>::value) || (std::is_same<T, std::string>::value) ) {
-        // Implementar para string
         return setString(key, value);
       }
     }
 
-
     size_t size() const;
+
   private:
     JsonValue& setBool(const std::string& key, bool boolValue);
     JsonValue& setInt(const std::string& key, int intValue);
@@ -198,18 +158,5 @@ namespace mgutils
     rapidjson::Document::AllocatorType& _allocator;
   };
 
-  class Json
-  {
-  public:
-    // Parsing
-    static bool parse(const std::string& json, JsonDocument& document);
-    static bool parseFile(const std::string& filePath, JsonDocument& document);
-
-    // Serialization
-    static std::string toString(JsonDocument& document, bool pretty = false);
-    static void save(JsonDocument& document, const std::string& file);
-    static void save(const std::string& strJson, const std::string& file);
-  };
 }
-
-#endif //MGUTILS_JSON_H
+#endif //MGUTILS_JSONVALUE_H

@@ -1,85 +1,14 @@
-#include "Json.h"
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/filewritestream.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-#include <cstdio>
+//
+// Created by Arthur Motelevicz on 23/08/24.
+//
+
+#include "JsonValue.h"
 
 namespace mgutils
 {
-  JsonDocument::JsonDocument():
-  _document(),
-  _allocator(_document.GetAllocator())
-  {}
-
-  rapidjson::Document& JsonDocument::getDocument()
-  {
-    return _document;
-  }
-
-  rapidjson::Document::AllocatorType& JsonDocument::getAllocator()
-  {
-    return _allocator;
-  }
-
-  bool Json::parse(const std::string& json, JsonDocument& document)
-  {
-    document.getDocument().Parse(json.c_str(), json.length());
-    return !document.getDocument().HasParseError();
-  }
-
-  bool Json::parseFile(const std::string& filePath, JsonDocument& document) {
-    FILE* fp = fopen(filePath.c_str(), "r");
-    if (!fp) {
-      return false;
-    }
-
-    char readBuffer[65536];
-    rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-    document.getDocument().ParseStream(is);
-    fclose(fp);
-    return !document.getDocument().IsNull();
-  }
-
-  std::string Json::toString(JsonDocument& document, bool pretty)
-  {
-    rapidjson::StringBuffer buffer;
-    if (pretty) {
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-      document.getDocument().Accept(writer);
-    } else {
-      rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-      document.getDocument().Accept(writer);
-    }
-    return buffer.GetString();
-  }
-
-  void Json::save(JsonDocument& document, const std::string& file)
-  {
-    FILE* fp = fopen(file.c_str(), "w");
-    if (fp) {
-      char writeBuffer[65536];
-      rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-      rapidjson::Writer<rapidjson::FileWriteStream> writer(os);
-      document.getDocument().Accept(writer);
-      fclose(fp);
-    }
-  }
-
-  void Json::save(const std::string& strJson, const std::string& file)
-  {
-    std::ofstream outFile(file);
-    if (outFile.is_open()) {
-      outFile << strJson;
-      outFile.close();
-    }
-  }
-
-  // JSONValue -----------
-
   // Movement constructor
   JsonValue::JsonValue(JsonValue&& other) noexcept:
-  _value(std::move(other._value)), _allocator(other._allocator){}
+      _value(std::move(other._value)), _allocator(other._allocator){}
 
   JsonValue& JsonValue::operator=(JsonValue&& other) noexcept
   {
@@ -90,63 +19,62 @@ namespace mgutils
     return *this;
   }
 
-
   JsonValue::JsonValue(const rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator):
-  _value(value, allocator),_allocator(allocator) {}
+      _value(value, allocator),_allocator(allocator) {}
 
   JsonValue::JsonValue(rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNullType), _allocator(allocator) {}
+      _value(rapidjson::kNullType), _allocator(allocator) {}
 
   JsonValue::JsonValue(const std::string& value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kStringType), _allocator(allocator)
+      _value(rapidjson::kStringType), _allocator(allocator)
   {
     _value.SetString(value.c_str(), allocator);
   }
 
   JsonValue::JsonValue(const char* value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kStringType), _allocator(allocator)
+      _value(rapidjson::kStringType), _allocator(allocator)
   {
     _value.SetString(value, allocator);
   }
 
   JsonValue::JsonValue(bool value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kFalseType), _allocator(allocator)
+      _value(rapidjson::kFalseType), _allocator(allocator)
   {
     _value.SetBool(value);
   }
 
   JsonValue::JsonValue(int value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNumberType), _allocator(allocator)
+      _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetInt(value);
   }
 
   JsonValue::JsonValue(int64_t value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNumberType), _allocator(allocator)
+      _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetInt64(value);
   }
 
   JsonValue::JsonValue(uint value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNumberType), _allocator(allocator)
+      _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetUint(value);
   }
 
   JsonValue::JsonValue(uint64_t value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNumberType), _allocator(allocator)
+      _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetUint64(value);
   }
 
   JsonValue::JsonValue(float value, rapidjson::Document::AllocatorType& allocator)
-  : _value(rapidjson::kNumberType), _allocator(allocator)
+      : _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetFloat(value);
   }
 
   JsonValue::JsonValue(double value, rapidjson::Document::AllocatorType& allocator):
-  _value(rapidjson::kNumberType), _allocator(allocator)
+      _value(rapidjson::kNumberType), _allocator(allocator)
   {
     _value.SetDouble(value);
   }
@@ -236,23 +164,27 @@ namespace mgutils
     return std::nullopt;
   }
 
-  JsonValue JsonValue::getObject(const std::string& key) const {
-    if (_value.HasMember(key.c_str()) && _value[key.c_str()].IsObject()) {
-      // Aqui, retornamos o JsonValue com o objeto associado à chave
-      return JsonValue(_value[key.c_str()], _allocator);
+  JsonValue JsonValue::getObject(const std::string& key) const
+  {
+    if (_value[key.c_str()].IsObject() && _value.HasMember(key.c_str()))
+    {
+      return {_value[key.c_str()], _allocator};
     }
-    // Caso contrário, lance uma exceção ou retorne um JsonValue inválido, conforme necessário
     throw std::runtime_error("Key not found or not an object");
   }
 
-  std::vector<JsonValue> JsonValue::getArray(const std::string& key) const {
+  std::vector<JsonValue> JsonValue::getArray(const std::string& key) const
+  {
     std::vector<JsonValue> values;
-    if (_value.HasMember(key.c_str()) && _value[key.c_str()].IsArray()) {
-      for (auto& v : _value[key.c_str()].GetArray()) {
+    if ( _value[key.c_str()].IsArray() && _value.HasMember(key.c_str()))
+    {
+      for (auto& v : _value[key.c_str()].GetArray())
+      {
         values.emplace_back(v, _allocator);
       }
+      return values;
     }
-    return values;
+    throw std::runtime_error("Key not found or not an array");
   }
 
   JsonValue& JsonValue::setVector(const std::string& key, std::vector<JsonValue>& values)
@@ -386,6 +318,7 @@ namespace mgutils
 
     return *this;
   }
+
   std::optional<std::string> JsonValue::asString() const
   {
     if (_value.IsString()) {

@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <mgutils/Json.h>
+#include "mgutils/json/Json.h"
 
 using namespace mgutils;
 
@@ -21,17 +21,17 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     })";
 
   // Create a JsonDocument
-  JsonDocument document;
+  auto document = Json::parse(jsonString);
 
-  SECTION("Valid JSON parsing with extended types") {
-    // Parse the JSON string
-    bool success = Json::parse(jsonString, document);
+  SECTION("Parsing")
+  {
+    REQUIRE(document != nullptr);
+  }
 
-    // Verify that parsing was successful
-    REQUIRE(success);
-
+  SECTION("Valid JSON parsing with extended types")
+  {
     // Get the root object
-    JsonValue root = document.getRoot();
+    JsonValue root = document->getRoot();
 
     // Verify the contents of the JSON
     REQUIRE(root.getString("name") == std::optional<std::string>("Test Name"));
@@ -43,14 +43,10 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(root.getUint("unsignedId") == std::optional<unsigned int>(987654321));
   }
 
-  SECTION("Parsing and accessing subobjects") {
-    // Parse the JSON string
-
-    bool success = Json::parse(jsonString, document);
-    REQUIRE(success);
-
+  SECTION("Accessing subobjects")
+  {
     // Get the root object
-    JsonValue root = document.getRoot();
+    JsonValue root = document->getRoot();
 
     // Access subobject
     JsonValue attributes = root.getObject("attributes");
@@ -61,13 +57,10 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(attributes.getInt("dexterity") == std::optional<int>(90));
   }
 
-  SECTION("Parsing and accessing arrays") {
-    // Parse the JSON string
-    bool success = Json::parse(jsonString, document);
-    REQUIRE(success);
-
+  SECTION("Accessing arrays")
+  {
     // Get the root object
-    JsonValue root = document.getRoot();
+    JsonValue root = document->getRoot();
 
     // Access array
     std::vector<JsonValue> items = root.getArray("items");
@@ -79,13 +72,10 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(items[2].asString() == std::optional<std::string>("potion"));
   }
 
-  SECTION("Setting values in JSON") {
-    // Parse the JSON string
-    bool success = Json::parse(jsonString, document);
-    REQUIRE(success);
-
+  SECTION("Setting values in JSON")
+  {
     // Get the root object
-    JsonValue root = document.getRoot();
+    JsonValue root = document->getRoot();
 
     // Set new values or replace them
     root.set("name", "New Name");
@@ -104,13 +94,10 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(root.getUint("unsignedId") == std::optional<unsigned int>(123456789u));
   }
 
-  SECTION("Setting and replacing values in JSON without duplication") {
-    // Parse the JSON string
-    bool success = Json::parse(jsonString, document);
-    REQUIRE(success);
-
+  SECTION("Setting and replacing values in JSON without duplication")
+  {
     // Get the root object
-    JsonValue root = document.getRoot();
+    JsonValue root = document->getRoot();
 
     // Capture the initial member count
     size_t initialMemberCount = root.size();
@@ -124,7 +111,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     root.set("unsignedId", 123456789u);
 
     // Capture the member count after setting new values
-    size_t finalMemberCount = root.size();  // Assumindo que você tenha um método `size()` ou equivalente
+    size_t finalMemberCount = root.size();
 
     // Verify that the member count has not changed
     REQUIRE(finalMemberCount == initialMemberCount);
@@ -140,8 +127,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
   SECTION("Creating and manipulating arrays in JSON") {
     // Create a new empty JSON document
-    JsonDocument document;
-    JsonValue root = document.getRoot();
+    JsonDocument doc;
+    JsonValue root = doc.getRoot();
 
     // Define an empty array
     root.set("items", std::vector<JsonValue>());
@@ -151,9 +138,9 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(items.empty());
 
     // Add items to the array
-    items.emplace_back("sword", document.getAllocator());
-    items.emplace_back("shield", document.getAllocator());
-    items.emplace_back("potion", document.getAllocator());
+    items.emplace_back("sword", doc.getAllocator());
+    items.emplace_back("shield", doc.getAllocator());
+    items.emplace_back("potion", doc.getAllocator());
 
     // Update the array in the document
     root.set("items", items);
@@ -166,7 +153,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
     REQUIRE(items[2].asString() == std::optional<std::string>("potion"));
 
     // Modify an item within the array
-    items[1] = JsonValue("armor", document.getAllocator());
+    items[1] = JsonValue("armor", doc.getAllocator());
     root.set("items", items);
 
     // Verify that the item was modified correctly
@@ -176,8 +163,8 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
 
     // Test adding a new array as a value (nested array)
     std::vector<JsonValue> nestedArray;
-    nestedArray.push_back(JsonValue("nested1", document.getAllocator()));
-    nestedArray.push_back(JsonValue("nested2", document.getAllocator()));
+    nestedArray.push_back(JsonValue("nested1", doc.getAllocator()));
+    nestedArray.push_back(JsonValue("nested2", doc.getAllocator()));
     root.set("nestedArray", nestedArray);
 
     // Verify the contents of the nested array
@@ -188,7 +175,7 @@ TEST_CASE("JsonDocument extended JSON parsing and manipulation", "[JsonDocument]
   }
 }
 
-TEST_CASE("JsonValue Root")
+TEST_CASE("JsonValue set transform")
 {
   JsonDocument document;
   JsonValue jsonValue = JsonValue("testValue", document.getAllocator());
