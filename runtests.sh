@@ -15,7 +15,7 @@ fi
 cd "$build_dir" || { echo "Failed to enter the directory $build_dir"; exit 1; }
 
 # Run CMake with specified options
-cmake -DMGUTILS_BUILD_TESTS=ON -DMGUTILS_BUILD_EXAMPLES=OFF ..
+cmake -DCMAKE_BUILD_TYPE=Debug -DMGUTILS_BUILD_TESTS=ON -DMGUTILS_BUILD_EXAMPLES=OFF ..
 
 # Build the project with make (or ninja if you prefer)
 cmake --build .
@@ -37,4 +37,4 @@ cd tests || { echo "Failed to enter the docs directory"; exit 1; }
 cd "$current_dir" || { echo "Failed to return to the original directory"; exit 1; }
 
 # Confirmation of successful execution
-echo "Build and execution of mgu_docs completed successfully."
+echo "Build and execution of mgu_tests completed successfully."

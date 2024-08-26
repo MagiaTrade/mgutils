@@ -48,9 +48,9 @@ TEST_CASE("CSV basic tests", "[CsvLoader]") {
   SECTION("Handling exceptions on invalid operations") {
     CsvLoader loader(filename);
 
-    REQUIRE_THROWS_AS(loader.getColumn<std::string>("InvalidColumn"), std::runtime_error);
-    REQUIRE_THROWS_AS(loader.getRow<std::string>(9999), std::runtime_error);
-    REQUIRE_THROWS_AS(loader.getCell<std::string>("Column1", 9999), std::runtime_error);
+    REQUIRE_THROWS_AS(loader.getColumn<std::string>("InvalidColumn"), CsvUsageException);
+    REQUIRE_THROWS_AS(loader.getRow<std::string>(9999), CsvUsageException);
+    REQUIRE_THROWS_AS(loader.getCell<std::string>("Column1", 9999), CsvUsageException);
   }
 
   SECTION("Saving a CSV file") {

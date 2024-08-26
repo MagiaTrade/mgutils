@@ -11,8 +11,9 @@ add_executable(${PROJECT_NAME}
 #    cases/jobpool_tests.cpp
 #    cases/events_tests.cpp
 #    cases/json_tests.cpp
-#    cases/csv_tests.cpp
-    cases/files_tests.cpp)
+    cases/csv_tests.cpp
+#    cases/files_tests.cpp
+    )
 
 set(TEST_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 

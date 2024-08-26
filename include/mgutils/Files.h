@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "Exceptions.h"
 
 namespace mgutils {
 
@@ -39,7 +40,7 @@ namespace mgutils {
     static std::string readFile(const std::string& path) {
       std::ifstream file(path);
       if (!file.is_open()) {
-        throw std::runtime_error("Could not open file: " + path);
+        throw FilesException("Could not open file: " + path);
       }
 
       std::stringstream buffer;
@@ -51,7 +52,7 @@ namespace mgutils {
     static void writeFile(const std::string& path, const std::string& content) {
       std::ofstream file(path);
       if (!file.is_open()) {
-        throw std::runtime_error("Could not open file for writing: " + path);
+        throw FilesException("Could not open file for writing: " + path);
       }
 
       file << content;
@@ -104,7 +105,7 @@ namespace mgutils {
     static void createFile(const std::string& path) {
       std::ofstream file(path);
       if (!file.is_open()) {
-        throw std::runtime_error("Could not create file: " + path);
+        throw FilesException("Could not create file: " + path);
       }
       // File created, nothing else to do
     }

@@ -4,6 +4,7 @@
 
 #include "JsonValue.h"
 #include "JsonDocument.h"
+#include "Exceptions.h"
 
 namespace mgutils
 {
@@ -188,7 +189,7 @@ namespace mgutils
       return {_value[key.c_str()], _allocator};
     }
 
-    throw std::runtime_error("Key not found or not an object");
+    throw JsonParseException("Key not found or not an object");
 
     // return to avoid warning only
     return {_value,_allocator};
@@ -207,7 +208,7 @@ namespace mgutils
       }
       return values;
     }
-    throw std::runtime_error("JsonValue is not an array");
+    throw JsonUsageException("JsonValue is not an array: ");
   }
 
   std::vector<JsonValue> JsonValue::getArray(const std::string& key) const
@@ -221,7 +222,7 @@ namespace mgutils
       }
       return values;
     }
-    throw std::runtime_error("Key not found or not an array");
+    throw JsonUsageException("Key not found or not an array: " + key);
   }
 
   JsonValue& JsonValue::setObject(const std::string& key, const JsonValue& objectValue)

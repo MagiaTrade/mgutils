@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#include "Exceptions.h"
 
 namespace mgutils {
 
@@ -17,7 +18,7 @@ namespace mgutils {
         // Pass delimiter parameter to the rapidcsv::Document
         _document = std::make_unique<rapidcsv::Document>(filename, rapidcsv::LabelParams(0, -1), rapidcsv::SeparatorParams(delimiter));
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to load CSV file: " + std::string(e.what()));
+        throw CsvReadException("Failed to load CSV file: " + std::string(e.what()));
       }
     }
 
@@ -26,7 +27,7 @@ namespace mgutils {
       try {
         return _document->GetColumn<T>(columnName);
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to get column: " + std::string(e.what()));
+        throw  CsvUsageException("Failed to get column: " + std::string(e.what()));
       }
     }
 
@@ -35,7 +36,7 @@ namespace mgutils {
       try {
         return _document->GetRow<T>(rowIndex);
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to get row: " + std::string(e.what()));
+        throw CsvUsageException("Failed to get row: " + std::string(e.what()));
       }
     }
 
@@ -44,7 +45,7 @@ namespace mgutils {
       try {
         return _document->GetCell<T>(columnName, rowIndex);
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to get cell: " + std::string(e.what()));
+        throw CsvUsageException("Failed to get cell: " + std::string(e.what()));
       }
     }
 
@@ -52,7 +53,7 @@ namespace mgutils {
       try {
         _document->Save(filename);
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to save CSV file: " + std::string(e.what()));
+        throw CsvWriteException("Failed to save CSV file: " + std::string(e.what()));
       }
     }
 
@@ -73,7 +74,7 @@ namespace mgutils {
 
         return data;
       } catch (const std::exception& e) {
-        throw std::runtime_error("Failed to get all data: " + std::string(e.what()));
+        throw CsvReadException("Failed to get all data: " + std::string(e.what()));
       }
     }
 
