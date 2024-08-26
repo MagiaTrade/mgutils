@@ -33,7 +33,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 ## External deps BEGIN -----------
-set(EXTERNAL_DIR external)
+set(EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 if(NOT EXISTS "${EXTERNAL_DIR}")
     message(STATUS "Directory ${EXTERNAL_DIR} does not exist. Creating and running script...")
@@ -41,8 +41,8 @@ if(NOT EXISTS "${EXTERNAL_DIR}")
     file(MAKE_DIRECTORY  "${EXTERNAL_DIR}")
 
     execute_process(
-        COMMAND bash "${CMAKE_SOURCE_DIR}/install-deps.sh"
-        WORKING_DIRECTORY  "${CMAKE_SOURCE_DIR}"
+        COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/install-deps.sh"
+        WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}"
         RESULT_VARIABLE result
     )
 
@@ -57,8 +57,10 @@ add_subdirectory(external/spdlog)
 
 # to honor the value before add the library #
 set(TBB_TEST OFF)                            #
-# ------------------------------------------ #
+set(BUILD_SHARED_LIBS ON)                            #
 add_subdirectory(external/oneTBB)
+set(BUILD_SHARED_LIBS OFF)
+# ------------------------------------------ #
 
 add_subdirectory(external/rapidcsv)
 

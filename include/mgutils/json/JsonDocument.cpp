@@ -20,7 +20,7 @@ namespace mgutils
     return _allocator;
   }
 
-  std::string JsonDocument::toString(bool pretty)
+  std::string JsonDocument::toString(bool pretty) const
   {
     rapidjson::StringBuffer buffer;
     if (pretty) {

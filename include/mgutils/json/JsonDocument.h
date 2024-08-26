@@ -26,7 +26,7 @@ namespace mgutils
     JsonValue getRoot();  // To get the root object
     rapidjson::Document::AllocatorType& getAllocator();
     // Serialization
-    std::string toString(bool pretty = false);
+    std::string toString(bool pretty = false) const;
     bool save(const std::string& file);
     bool isArray();
     bool isObject();
