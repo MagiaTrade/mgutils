@@ -16,7 +16,7 @@ set(MG_UTILS_FILES
     include/mgutils/JobPool.h
         include/mgutils/Json.cpp include/mgutils/Json.h
         include/mgutils/Json.cpp include/mgutils/Json.cpp
-        include/mgutils/json/JsonDocument.cpp include/mgutils/json/JsonDocument.h include/mgutils/json/JsonValue.cpp include/mgutils/json/JsonValue.h include/mgutils/CsvLoader.h)
+        include/mgutils/json/JsonDocument.cpp include/mgutils/json/JsonDocument.h include/mgutils/json/JsonValue.cpp include/mgutils/json/JsonValue.h include/mgutils/CsvLoader.h include/mgutils/Files.h)
 
 add_library(${PROJECT_NAME}  STATIC
     ${MG_UTILS_FILES}
