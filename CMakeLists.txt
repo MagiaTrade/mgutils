@@ -16,7 +16,7 @@ set(MG_UTILS_FILES
     include/mgutils/JobPool.h
         include/mgutils/Json.cpp include/mgutils/Json.h
         include/mgutils/Json.cpp include/mgutils/Json.cpp
-        include/mgutils/json/JsonDocument.cpp include/mgutils/json/JsonDocument.h include/mgutils/json/JsonValue.cpp include/mgutils/json/JsonValue.h)
+        include/mgutils/json/JsonDocument.cpp include/mgutils/json/JsonDocument.h include/mgutils/json/JsonValue.cpp include/mgutils/json/JsonValue.h include/mgutils/CsvLoader.h)
 
 add_library(${PROJECT_NAME}  STATIC
     ${MG_UTILS_FILES}
@@ -54,6 +54,8 @@ set(TBB_TEST OFF)                            #
 # ------------------------------------------ #
 add_subdirectory(external/oneTBB)
 
+add_subdirectory(external/rapidcsv)
+
 
 # turn off rapidjson extra builds
 set(RAPIDJSON_BUILD_DOC OFF)
@@ -85,6 +87,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PUBLIC
     include/mgutils
     include/mgutils/json
+    external/rapidcsv/src
     external/rapidjson/include
     external/catch2/single_include
 )

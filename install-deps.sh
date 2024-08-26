@@ -32,6 +32,13 @@ else
   git clone https://github.com/Tencent/rapidjson.git "$DIR/rapidjson"
 fi
 
+if [ -d "$DIR/rapidcsv" ]; then
+  echo "$DIR rapicsv exists!"
+else
+  echo "$DIR Downloading rapidcsv:"
+  git clone https://github.com/d99kris/rapidcsv.git "$DIR/rapidcsv"
+fi
+
 
 
 
