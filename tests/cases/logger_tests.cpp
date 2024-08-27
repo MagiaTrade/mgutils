@@ -16,7 +16,7 @@ std::size_t getFileSize(const std::string& filename)
   return rc == 0 ? stat_buf.st_size : 0;
 }
 
-TEST_CASE("Logger Singleton Instance")
+TEST_CASE("Logger Singleton Instance", "[logger]")
 {
   // Ensure that the Logger instance is always the same (singleton pattern)
   auto& logger1 = mgutils::Logger::instance();
@@ -25,7 +25,7 @@ TEST_CASE("Logger Singleton Instance")
   REQUIRE(&logger1 == &logger2); // Both should point to the same instance
 }
 
-TEST_CASE("Setting Log Levels")
+TEST_CASE("Setting Log Levels", "[logger]")
 {
   auto& logger = Logger::instance();
 
@@ -360,6 +360,93 @@ TEST_CASE("Logger macros", "[logger][macros]")
   }
 
   logFile.close();
+}
+
+TEST_CASE("Logger handles strings with and without format placeholders correctly", "[logger][formatting]")
+{
+  auto& logger = Logger::instance();
+  std::string logFilename = "formatting_test_log.txt";
+
+  // Remove the file if it exists already
+  std::remove(logFilename.c_str());
+
+  logger.addFileSink(logFilename);
+  logger.setLogLevel(Info);
+  logger.setPattern("%v", false);
+
+  SECTION("String without format placeholders")
+  {
+    logger.log(Info, "This is a simple log message without placeholders.");
+    logger.flush();
+
+    std::ifstream logFile(logFilename);
+    REQUIRE(logFile.is_open());
+
+    std::string logContents;
+    std::string line;
+
+    while (std::getline(logFile, line)) {
+      logContents += line + "\n";
+    }
+
+    logFile.close();
+
+    REQUIRE(logContents.find("This is a simple log message without placeholders.") != std::string::npos);
+  }
+
+  SECTION("String with format placeholders")
+  {
+    logger.log(Info, "Formatted message with placeholder: {}", 123);
+    logger.flush();
+
+    std::ifstream logFile(logFilename);
+    REQUIRE(logFile.is_open());
+
+    std::string logContents;
+    std::string line;
+
+    while (std::getline(logFile, line)) {
+      logContents += line + "\n";
+    }
+
+    logFile.close();
+
+    REQUIRE(logContents.find("Formatted message with placeholder: 123") != std::string::npos);
+  }
+}
+
+TEST_CASE("Logger correctly logs messages without exceptions", "[logger][formatting]")
+{
+  auto& logger = Logger::instance();
+  std::string logFilename = "exception_handling_test_log.txt";
+
+  // Remove the file if it exists already
+  std::remove(logFilename.c_str());
+
+  logger.addFileSink(logFilename);
+  logger.setLogLevel(Info);
+  logger.setPattern("%v", true);
+
+  SECTION("Logging string with incorrect format placeholders")
+  {
+    REQUIRE_NOTHROW(logger.log(Info, "Incorrect format string with placeholder {} without argument."));
+    logger.flush();
+
+    std::ifstream logFile(logFilename);
+    REQUIRE(logFile.is_open());
+
+    std::string logContents;
+    std::string line;
+
+    while (std::getline(logFile, line)) {
+      logContents += line + "\n";
+    }
+
+    logFile.close();
+
+    // Since there was a placeholder without an argument, log should not crash or throw, but handle gracefully.
+    REQUIRE(logContents.find("Incorrect format string with placeholder {} without argument.") != std::string::npos);
+  }
 }
 
 TEST_CASE("Logger move", "[logger][move]")

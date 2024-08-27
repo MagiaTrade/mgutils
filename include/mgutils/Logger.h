@@ -19,7 +19,7 @@
         std::ostringstream oss;                                            \
         oss << message << " (Error code: " << code                         \
             << ", File: " << __FILE__ << ", Line: " << __LINE__ << ")";    \
-        Logger::instance().log(mgutils::LogLevel::Error, oss.str());       \
+        mgutils::Logger::instance().log(mgutils::LogLevel::Error, oss.str());       \
         mgutils::ErrorInfo errorInfo(code, message, __FILE__, __LINE__);   \
         mgutils::ErrorManager::instance().notify(errorInfo);               \
     } while (0)
@@ -103,72 +103,37 @@ namespace mgutils
 
     void flush() const;
 
-    template<typename... Args>
+    template <typename... Args>
     void log(LogLevel level, const std::string& format, Args&&... args)
     {
-      switch (level)
-      {
+      switch (level) {
         case LogLevel::Trace:
-          _traceLogger->trace(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->trace(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_traceLogger, level, format, std::forward<Args>(args)...);
           break;
         case LogLevel::Debug:
-          _debugLogger->debug(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->debug(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_debugLogger, level, format, std::forward<Args>(args)...);
           break;
         case LogLevel::Info:
-          _infoLogger->info(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->info(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_infoLogger, level, format, std::forward<Args>(args)...);
           break;
         case LogLevel::Warning:
-          _warningLogger->warn(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->warn(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_warningLogger, level, format, std::forward<Args>(args)...);
           break;
         case LogLevel::Error:
-          _errorLogger->error(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->error(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_errorLogger, level, format, std::forward<Args>(args)...);
           break;
         case LogLevel::Critical:
-          _criticalLogger->critical(fmt::format(format, std::forward<Args>(args)...));
-          _fileLogger->critical(fmt::format(format, std::forward<Args>(args)...));
+          logInternal(_criticalLogger, level, format, std::forward<Args>(args)...);
           break;
       }
     }
 
-    // Log a custom message with a specified color and log level
-    template<typename... Args>
-    void logCustom(LogLevel level, const std::string& color_code, const std::string& message, Args&&... args)
+    template <typename... Args>
+    void logCustom(LogLevel level, const std::string& color_code, const std::string& format, Args&&... args)
     {
       std::string customPattern = color_code + _cachedPattern + RESET;
       _customLogger->set_pattern(customPattern);
-
-      switch (level) {
-        case LogLevel::Trace:
-          _customLogger->trace(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->trace(fmt::format(message, std::forward<Args>(args)...));
-          break;
-        case LogLevel::Debug:
-          _customLogger->debug(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->debug(fmt::format(message, std::forward<Args>(args)...));
-          break;
-        case LogLevel::Info:
-          _customLogger->info(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->info(fmt::format(message, std::forward<Args>(args)...));
-          break;
-        case LogLevel::Warning:
-          _customLogger->warn(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->warn(fmt::format(message, std::forward<Args>(args)...));
-
-          break;
-        case LogLevel::Error:
-          _customLogger->error(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->error(fmt::format(message, std::forward<Args>(args)...));
-          break;
-        case LogLevel::Critical:
-          _customLogger->critical(fmt::format(message, std::forward<Args>(args)...));
-          _fileLogger->critical(fmt::format(message, std::forward<Args>(args)...));
-          break;
-      }
+      logInternal(_customLogger, level, format, std::forward<Args>(args)...);
     }
 
     // Set the global log level for the logger
@@ -191,8 +156,65 @@ namespace mgutils
     Logger& operator=(const Logger&) = delete;
 
     // Enable move
-    Logger(Logger&&) noexcept = default;
-    Logger& operator=(Logger&&) noexcept = default;
+    Logger(Logger&& other) noexcept
+    {
+      // Move the members from other to this
+      _traceLogger = std::move(other._traceLogger);
+      _debugLogger = std::move(other._debugLogger);
+      _infoLogger = std::move(other._infoLogger);
+      _warningLogger = std::move(other._warningLogger);
+      _errorLogger = std::move(other._errorLogger);
+      _criticalLogger = std::move(other._criticalLogger);
+      _customLogger = std::move(other._customLogger);
+      _fileLogger = std::move(other._fileLogger);
+      _logFileName = std::move(other._logFileName);
+      _cachedPattern = std::move(other._cachedPattern);
+
+      // Reset the state of the moved-from object
+      other._traceLogger = nullptr;
+      other._debugLogger = nullptr;
+      other._infoLogger = nullptr;
+      other._warningLogger = nullptr;
+      other._errorLogger = nullptr;
+      other._criticalLogger = nullptr;
+      other._customLogger = nullptr;
+      other._fileLogger = nullptr;
+      other._logFileName.clear();
+      other._cachedPattern.clear();
+    }
+
+    Logger& operator=(Logger&& other) noexcept
+        {
+      if (this != &other)
+      {
+        // Move the members from other to this
+        _traceLogger = std::move(other._traceLogger);
+        _debugLogger = std::move(other._debugLogger);
+        _infoLogger = std::move(other._infoLogger);
+        _warningLogger = std::move(other._warningLogger);
+        _errorLogger = std::move(other._errorLogger);
+        _criticalLogger = std::move(other._criticalLogger);
+        _customLogger = std::move(other._customLogger);
+        _fileLogger = std::move(other._fileLogger);
+        _logFileName = std::move(other._logFileName);
+        _cachedPattern = std::move(other._cachedPattern);
+
+        // Reset the state of the moved-from object
+        other._traceLogger = nullptr;
+        other._debugLogger = nullptr;
+        other._infoLogger = nullptr;
+        other._warningLogger = nullptr;
+        other._errorLogger = nullptr;
+        other._criticalLogger = nullptr;
+        other._customLogger = nullptr;
+        other._fileLogger = nullptr;
+        other._logFileName.clear();
+        other._cachedPattern.clear();
+      }
+      return *this;
+    }
+
+    friend class LogMessage;
 
   private:
     std::string _logFileName;
@@ -216,6 +238,69 @@ namespace mgutils
     std::string _criticalPattern;
 
     std::string _instanceId;
+    std::mutex _mutex; //to use on destructor of log messages stream
+
+    template <typename... Args>
+    void logInternal(const std::shared_ptr<spdlog::logger>& logger, LogLevel level, const std::string& format, Args&&... args) {
+      if constexpr (sizeof...(args) > 0) {
+        // Use fmt::format only when there are arguments provided
+        std::string formattedMessage = fmt::format(format, std::forward<Args>(args)...);
+        switch (level) {
+          case LogLevel::Trace:
+            logger->trace(formattedMessage);
+            _fileLogger->trace(formattedMessage);
+            break;
+          case LogLevel::Debug:
+            logger->debug(formattedMessage);
+            _fileLogger->debug(formattedMessage);
+            break;
+          case LogLevel::Info:
+            logger->info(formattedMessage);
+            _fileLogger->info(formattedMessage);
+            break;
+          case LogLevel::Warning:
+            logger->warn(formattedMessage);
+            _fileLogger->warn(formattedMessage);
+            break;
+          case LogLevel::Error:
+            logger->error(formattedMessage);
+            _fileLogger->error(formattedMessage);
+            break;
+          case LogLevel::Critical:
+            logger->critical(formattedMessage);
+            _fileLogger->critical(formattedMessage);
+            break;
+        }
+      } else {
+        // No arguments, log the raw string
+        switch (level) {
+          case LogLevel::Trace:
+            logger->trace(format);
+            _fileLogger->trace(format);
+            break;
+          case LogLevel::Debug:
+            logger->debug(format);
+            _fileLogger->debug(format);
+            break;
+          case LogLevel::Info:
+            logger->info(format);
+            _fileLogger->info(format);
+            break;
+          case LogLevel::Warning:
+            logger->warn(format);
+            _fileLogger->warn(format);
+            break;
+          case LogLevel::Error:
+            logger->error(format);
+            _fileLogger->error(format);
+            break;
+          case LogLevel::Critical:
+            logger->critical(format);
+            _fileLogger->critical(format);
+            break;
+        }
+      }
+    }
   };
 } // namespace mgutils
 

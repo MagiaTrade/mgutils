@@ -9,7 +9,8 @@
 using namespace mgutils;
 
 // Test case for basic operations of CSVLoader
-TEST_CASE("CSV basic tests", "[CsvLoader]") {
+TEST_CASE("CSV basic tests", "[csv_loader]")
+{
   const std::string filename = "resources/test1.csv";  // Assume this file exists with appropriate content
   const std::string customDelimiterFilename = "resources/test_semicolon.csv";  // File with semicolon delimiter
 

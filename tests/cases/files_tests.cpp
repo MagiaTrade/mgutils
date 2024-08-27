@@ -8,7 +8,7 @@
 
 using namespace mgutils;
 
-TEST_CASE("Files utility class tests", "[Files]") {
+TEST_CASE("Files utility class tests", "[files]") {
   const std::string resourceDir = "resources/";
   const std::string testFile = resourceDir + "test_file.txt";
   const std::string testDir = resourceDir + "test_dir";

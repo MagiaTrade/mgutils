@@ -9,7 +9,7 @@
 using namespace mgutils;
 
 // Test case for basic subscription and notification of errors
-TEST_CASE("ErrorManager basic subscription and notification", "[ErrorManager]")
+TEST_CASE("ErrorManager basic subscription and notification", "[error_manager]")
 {
   ErrorInfo receivedError{0, "", "", 0};
 
@@ -35,7 +35,7 @@ TEST_CASE("ErrorManager basic subscription and notification", "[ErrorManager]")
 }
 
 // Test case to check if multiple subscribers receive the same error notification
-TEST_CASE("ErrorManager multiple subscribers", "[ErrorManager]")
+TEST_CASE("ErrorManager multiple subscribers", "[error_manager]")
 {
   ErrorInfo receivedError1{0, "", "", 0};
   ErrorInfo receivedError2{0, "", "", 0};
@@ -74,7 +74,7 @@ TEST_CASE("ErrorManager multiple subscribers", "[ErrorManager]")
 }
 
 // Test case to verify that a subscriber is properly disconnected
-TEST_CASE("ErrorManager subscriber disconnection", "[ErrorManager]")
+TEST_CASE("ErrorManager subscriber disconnection", "[error_manager]")
 {
   ErrorInfo receivedError1{0, "", "", 0};
   ErrorInfo receivedError2{0, "", "", 0};
@@ -114,7 +114,7 @@ TEST_CASE("ErrorManager subscriber disconnection", "[ErrorManager]")
 }
 
 // Test case to verify that ErrorManager handles notifications correctly in a multithreading scenario
-TEST_CASE("ErrorManager multithreading", "[ErrorManager][multithreading]")
+TEST_CASE("ErrorManager multithreading", "[error_manager][multithreading]")
 {
   std::atomic<int> counter(0);
 
@@ -149,7 +149,7 @@ TEST_CASE("ErrorManager multithreading", "[ErrorManager][multithreading]")
 }
 
 // Test case to verify that logger error notifications triggers the ErrorManager correctly
-TEST_CASE("ErrorManager from logger notification error", "[ErrorManager]")
+TEST_CASE("ErrorManager from logger notification error", "[error_manager]")
 {
   ErrorInfo receivedError{0, "", "", 0};
 
@@ -180,7 +180,7 @@ TEST_CASE("ErrorManager from logger notification error", "[ErrorManager]")
 }
 
 // Test case to verify that logger critical notifications triggers the ErrorManager correctly
-TEST_CASE("ErrorManager from logger notification critical", "[ErrorManager]")
+TEST_CASE("ErrorManager from logger notification critical", "[error_manager]")
 {
   ErrorInfo receivedError{0, "", "", 0};
 
