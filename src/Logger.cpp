@@ -166,16 +166,8 @@ _logger(logger), _level(level)
 
 LogMessage::~LogMessage()
 {
-  try {
-    std::lock_guard<std::mutex> lock(_logger._mutex);  // Protect access to the logger
-    _logger.logStream(_level, _stream.str());
-    _logger.flush();
-  } catch (const spdlog::spdlog_ex& ex) {
-    std::cerr << "Logging error in LogMessage destructor: " << ex.what() << std::endl;
-  } catch (const std::exception& ex) {
-    std::cerr << "Unexpected error in LogMessage destructor: " << ex.what() << std::endl;
-  }
-
+  _logger.logStream(_level, _stream.str());
+  _logger.flush();
 }
 
 

@@ -213,9 +213,7 @@ namespace mgutils
       }
       return *this;
     }
-
-    friend class LogMessage;
-
+    
   private:
     std::string _logFileName;
 
@@ -238,7 +236,6 @@ namespace mgutils
     std::string _criticalPattern;
 
     std::string _instanceId;
-    std::mutex _mutex; //to use on destructor of log messages stream
 
     template <typename... Args>
     void logInternal(const std::shared_ptr<spdlog::logger>& logger, LogLevel level, const std::string& format, Args&&... args) {
