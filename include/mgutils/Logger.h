@@ -213,7 +213,7 @@ namespace mgutils
       }
       return *this;
     }
-    
+
   private:
     std::string _logFileName;
 

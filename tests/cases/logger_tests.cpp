@@ -3,6 +3,7 @@
 //
 #include <catch2/catch.hpp>
 #include <mgutils/Logger.h>
+#include <mgutils/Files.h>
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
@@ -458,6 +459,28 @@ TEST_CASE("Logger move", "[logger][move]")
 
   // Note: Accessing logger1 after move. This is for testing purposes only.
   REQUIRE(logger1.getLogFilename().empty());
+}
+
+TEST_CASE("Logger move 2", "[logger][move]") {
+  std::string logFilename = "custom_log.txt";
+
+  // Remove o arquivo se ele já existir
+  std::remove(logFilename.c_str());
+
+  Logger logger1(logFilename);
+  Logger logger2 = std::move(logger1);
+
+  REQUIRE(logger2.getLogFilename() == logFilename);
+
+  // Note: Accessing logger1 after move. This is for testing purposes only.
+  REQUIRE(logger1.getLogFilename().empty());
+
+  logger2.log(Info, "Log message after move");
+  logger2.flush();
+
+  auto logContents = Files::readFile(logFilename);
+
+  REQUIRE(logContents.find("Log message after move") != std::string::npos);
 }
 
 
