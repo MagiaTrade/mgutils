@@ -37,12 +37,13 @@
 
 ## Installation
 
+> **⚠️ Warning:** This project has only been tested on macOS.
+
 ### Required Packages
 
 To use `mgutils`, you need to install the following packages:
 
 - [Boost (minimum version 1.83.0)](http://boost.org)
-- [OpenSSL(version 1.1)](https://www.openssl.org)
 
 #### macOS Installation
 
@@ -50,7 +51,6 @@ Install the required packages using Homebrew:
 
 ```sh
 brew install boost@1.83.0
-brew install openssl@1.1
 ```
 
 #### Linux Installation
@@ -59,7 +59,7 @@ On Linux, you can install Boost and OpenSSL using your package manager. For exam
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y libboost1.83-dev libssl1.1-dev
+sudo apt-get install -y libboost1.83-dev
 ```
 
 If Boost 1.83.0 is not available in your distribution, you may need to download and build it manually from the [Boost website](https://www.boost.org/users/download/).
@@ -70,7 +70,6 @@ On Windows, you can install Boost and OpenSSL using a package manager like vcpkg
 
 ```sh
 vcpkg install boost@1.83.0
-vcpkg install openssl@1.1
 ```
 
 Make sure to integrate vcpkg with your Visual Studio environment:
@@ -81,14 +80,13 @@ vcpkg integrate install
 
 The CMake configuration for the project will resolve any additional dependencies automatically.
 
-## Authors
-
-* **Tato Levicz** - [@tatolevicz](https://github.com/tatolevicz)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Documentation and Tests
+The test files included in this repository serve as living documentation. They provide concrete examples of how to use the various features of the mgutils library. By examining and running these tests, users can gain a better understanding of the library's functionality and intended use cases.
 
 ## Contributions
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs, feature requests, or improvements.
+
+## Authors
+
+* **Tato Levicz** - [@tatolevicz](https://github.com/tatolevicz)
