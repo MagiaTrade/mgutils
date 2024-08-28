@@ -14,11 +14,11 @@ set(MG_UTILS_FILES
     include/mgutils/Utils.h
     include/mgutils/ErrorManager.h
     include/mgutils/JobPool.h
-    include/mgutils/Json.cpp include/mgutils/Json.h
-    include/mgutils/Json.cpp include/mgutils/Json.cpp
-    include/mgutils/json/JsonDocument.cpp
+    src/Json.cpp include/mgutils/Json.h
+    src/Json.cpp src/Json.cpp
+    src/json/JsonDocument.cpp
     include/mgutils/json/JsonDocument.h
-    include/mgutils/json/JsonValue.cpp
+    src/json/JsonValue.cpp
     include/mgutils/json/JsonValue.h
     include/mgutils/CsvLoader.h
     include/mgutils/Files.h
