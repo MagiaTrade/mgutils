@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#### There is problem in CLION running tests because of the error and critical logs I think, so it not show tests passing properly.
+#### So the intent of this script is to build independently and run the tests to see if they are all passing.
+
 # Save the current directory
 current_dir=$(pwd)
 
