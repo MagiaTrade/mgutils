@@ -111,8 +111,10 @@ if (${Boost_FOUND})
     target_include_directories( ${PROJECT_NAME} PUBLIC
         ${Boost_INCLUDE_DIRS}
     )
+    message(STATUS "Boost version: ${Boost_VERSION_STRING}")
+
 else()
-    message(FATAL_ERROR "Boost not found please install it!")
+    message(FATAL_ERROR "Boost not found please install it! Instructions on readme.")
 endif()
 ## BOOST END -------------
 
