@@ -32,48 +32,77 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
 endif()
 
-## External deps BEGIN -----------
-set(EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
+# Include FetchContent module
+include(FetchContent)
 
-if(NOT EXISTS "${EXTERNAL_DIR}")
-    message(STATUS "Directory ${EXTERNAL_DIR} does not exist. Creating and running script...")
+# Set the base directory for external dependencies
+set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
-    file(MAKE_DIRECTORY  "${EXTERNAL_DIR}")
+# Ensure the external directory exists
+file(MAKE_DIRECTORY ${EXTERNAL_DIR})
 
-    execute_process(
-        COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/install-deps.sh"
-        WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}"
-        RESULT_VARIABLE result
-    )
+# Download and add spdlog to the external directory
+message(STATUS "Fetching spdlog...")
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG 5ebfc927306fd7ce551fa22244be801cf2b9fdd9
+)
+FetchContent_MakeAvailable(spdlog)
+message(STATUS "spdlog fetched and made available.")
 
-    if(result)
-        message(FATAL_ERROR "Script fail with code: ${result}")
-    endif()
-else()
-    message(STATUS "Directory ${EXTERNAL_DIR} already exists. Skipping script execution.")
-endif()
+# Download and add catch2 to the external directory
+message(STATUS "Fetching catch2...")
+FetchContent_Declare(
+    catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG ee1450f268dfd5c13aa8670ba97e93cabaf2e15d
+    SOURCE_DIR ${EXTERNAL_DIR}/catch2
+)
+FetchContent_MakeAvailable(catch2)
+message(STATUS "catch2 fetched and made available.")
 
-add_subdirectory(external/spdlog)
-
-# to honor the value before add the library #
-set(TBB_TEST OFF)                            #
-set(BUILD_SHARED_LIBS ON)                            #
-add_subdirectory(external/oneTBB)
+# Download and add oneTBB to the external directory
+message(STATUS "Fetching oneTBB...")
+FetchContent_Declare(
+    onetbb
+    GIT_REPOSITORY https://github.com/oneapi-src/oneTBB.git
+    GIT_TAG aae7fa62d1ffecd0af05bbd328899845c33be327
+    SOURCE_DIR ${EXTERNAL_DIR}/onetbb
+)
+set(BUILD_SHARED_LIBS ON)
+FetchContent_MakeAvailable(onetbb)
 set(BUILD_SHARED_LIBS OFF)
-# ------------------------------------------ #
+message(STATUS "oneTBB fetched and made available.")
 
-add_subdirectory(external/rapidcsv)
-
-
-# turn off rapidjson extra builds
+# Download and add rapidjson to the external directory
+message(STATUS "Fetching rapidjson...")
+FetchContent_Declare(
+    rapidjson
+    GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+    GIT_TAG 7c73dd7de7c4f14379b781418c6e947ad464c818
+    SOURCE_DIR ${EXTERNAL_DIR}/rapidjson
+)
 set(RAPIDJSON_BUILD_DOC OFF)
 set(RAPIDJSON_BUILD_EXAMPLES OFF)
 set(RAPIDJSON_BUILD_TESTS OFF)
 set(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT OFF)
 
-add_subdirectory(external/rapidjson)
+FetchContent_MakeAvailable(rapidjson)
+message(STATUS "rapidjson fetched and made available.")
 
-## External deps END -----------
+# Download and add rapidcsv to the external directory
+message(STATUS "Fetching rapidcsv...")
+
+FetchContent_Declare(
+    rapidcsv
+    GIT_REPOSITORY https://github.com/d99kris/rapidcsv.git
+    GIT_TAG f438d3774848e3c5e281fb15e12f97c0872cf6a8
+    SOURCE_DIR ${EXTERNAL_DIR}/rapidcsv
+)
+
+FetchContent_MakeAvailable(rapidcsv)
+message(STATUS "rapidcsv fetched and made available.")
 
 ## BOOST BEGIN -------------
 find_package(Boost REQUIRED)
