@@ -86,6 +86,15 @@ namespace mgutils
       return result;
     }
 
+    inline char randomChar()
+    {
+      const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const size_t max_index = (sizeof(charset) - 1);
+      static std::default_random_engine rng(std::random_device{}());
+      std::uniform_int_distribution<> dist(0, max_index - 1);
+      return charset[dist(rng)];
+    }
+
   }// namespace string
 
 } // namespace mgutils
