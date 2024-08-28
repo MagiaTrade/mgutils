@@ -42,7 +42,7 @@
 To use `mgutils`, you need to install the following packages:
 
 - [Boost (minimum version 1.83.0)](http://boost.org)
-- [OpenSSL](https://www.openssl.org)
+- [OpenSSL(version 1.1)](https://www.openssl.org)
 
 #### macOS Installation
 
