@@ -1,4 +1,3 @@
-
 # mgutils Library
 
 `mgutils` is a C++ utility library designed to provide a set of common functionalities that can be reused across different projects. It includes utilities for logging, JSON handling, CSV parsing, event management, file operations, error handling, and job pooling, all with a focus on performance and ease of use.
