@@ -13,11 +13,9 @@
 namespace mgutils
 {
 
-Logger::Logger(const std::string& logFilename)
+Logger::Logger(const std::string& logFilename):
+_logFileName(logFilename)
 {
-  std::string filename = logFilename.empty() ? "logs.txt" : logFilename;
-  _logFileName = filename;
-
   _instanceId = generateID(10);
   try {
     // Default log pattern
@@ -31,8 +29,13 @@ Logger::Logger(const std::string& logFilename)
     _criticalLogger = spdlog::stdout_color_mt(_instanceId + "critical_logger");
     _customLogger = spdlog::stdout_color_mt(_instanceId + "custom_logger");
 
-    //default log file. TODO:: think about this
-    _fileLogger = spdlog::basic_logger_mt(_instanceId + "file_logger", _logFileName);
+    bool shouldLogFile = !_logFileName.empty();
+
+    if(shouldLogFile)
+      _fileLogger = spdlog::basic_logger_mt(_instanceId + "file_logger", _logFileName);
+    else
+      _fileLogger = std::make_shared<spdlog::logger>(_instanceId + "file_logger");
+
     setPattern(_cachedPattern);
 
 #ifdef DEBUG
