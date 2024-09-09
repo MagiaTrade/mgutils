@@ -11,19 +11,76 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <cmath>  // Para isnan()
 #include <cstdint>
 
 #define fNaN (std::numeric_limits<float>::quiet_NaN())
-#define dNaN (std::numeric_limits<double>::quiet_NaN())
 
+#define dNaN (std::numeric_limits<double>::quiet_NaN())
 #define INVALID_INT (std::numeric_limits<int>::min())
 #define INVALID_INT8 (std::numeric_limits<int8_t>::min())
 #define INVALID_INT16 (std::numeric_limits<int16_t>::min())
 #define INVALID_INT32 (std::numeric_limits<int32_t>::min())
+
 #define INVALID_INT64 (std::numeric_limits<int64_t>::min())
+#define INVALID_UINT32 (std::numeric_limits<uint32_t>::max())
+
+#define INVALID_UINT64 (std::numeric_limits<uint64_t>::max())
+
+#define INVALID_CHAR '\0'
+
 
 namespace mgutils
 {
+//  template<typename T>
+//  bool isValid(T value);
+//
+//  template<>
+//  bool isValid<float>(float value) {
+//    return !std::isnan(value);
+//  }
+//
+//  template<>
+//  bool isValid<double>(double value) {
+//    return !std::isnan(value);
+//  }
+//
+//  template<>
+//  bool isValid<int8_t>(int8_t value) {
+//    return value != INVALID_INT8;
+//  }
+//
+//// Especialização para int16_t
+//  template<>
+//  bool isValid<int16_t>(int16_t value) {
+//    return value != INVALID_INT16;
+//  }
+//
+//  template<>
+//  bool isValid<int32_t>(int32_t value) {
+//    return value != INVALID_INT32;
+//  }
+//
+//  template<>
+//  bool isValid<int64_t>(int64_t value) {
+//    return value != INVALID_INT64;
+//  }
+//
+//  template<>
+//  bool isValid<uint32_t>(uint32_t value) {
+//    return value != INVALID_UINT32;
+//  }
+//
+//  template<>
+//  bool isValid<uint64_t>(uint64_t value) {
+//    return value != INVALID_UINT64;
+//  }
+//
+//  template<>
+//  bool isValid<char>(char value) {
+//    return value != INVALID_CHAR;
+//  }
+
   inline std::string generateUUID()
   {
     std::random_device rd;
