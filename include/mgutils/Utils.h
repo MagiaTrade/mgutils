@@ -99,6 +99,20 @@ namespace mgutils
     return ss.str();
   }
 
+  inline int generateRandomInt(int min, int max)
+  {
+   // Inicializa o motor de números aleatórios com um gerador de números pseudo-aleatórios
+   static std::random_device rd;  // Usa um gerador de números aleatórios de hardware se disponível
+   static std::mt19937 gen(rd()); // Mersenne Twister 19937 como motor padrão
+
+   // Define a distribuição de inteiros no intervalo [min, max]
+   std::uniform_int_distribution<> distrib(min, max);
+
+   // Gera um número inteiro aleatório
+   return distrib(gen);
+  }
+
+
   inline std::string generateID(std::size_t length)
   {
     const char characters[] =
