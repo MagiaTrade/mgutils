@@ -1,11 +1,6 @@
 //
 // Created by Arthur Motelevicz on 21/08/24.
 //
-
-//
-// Created by Arthur Motelevicz on 21/08/24.
-//
-
 #include "Logger.h"
 #include "Utils.h"
 #include <iostream>

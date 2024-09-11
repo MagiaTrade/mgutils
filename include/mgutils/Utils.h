@@ -13,6 +13,7 @@
 #include <limits>
 #include <cmath>  // Para isnan()
 #include <cstdint>
+#include <cctype>
 
 #define fNaN (std::numeric_limits<float>::quiet_NaN())
 
@@ -151,6 +152,12 @@ namespace mgutils
       std::uniform_int_distribution<> dist(0, max_index - 1);
       return charset[dist(rng)];
     }
+
+
+    inline bool isNumber(const std::string& str) {
+      return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+    }
+
 
   }// namespace string
 
