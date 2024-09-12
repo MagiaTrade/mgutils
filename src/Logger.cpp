@@ -8,7 +8,7 @@
 namespace mgutils
 {
 
-Logger::Logger(const std::string& logFilename):
+Logger::Logger(const std::string& logFilename, bool enableConsoleLogging):
 _logFileName(logFilename)
 {
   _instanceId = generateID(10);
@@ -16,13 +16,28 @@ _logFileName(logFilename)
     // Default log pattern
     _cachedPattern = "[%Y-%m-%d %H:%M:%S.%f] [thread %t] %v";
 
-    _traceLogger = spdlog::stdout_color_mt(_instanceId + "trace_logger");
-    _debugLogger = spdlog::stdout_color_mt(_instanceId +"debug_logger");
-    _infoLogger = spdlog::stdout_color_mt(_instanceId + "info_logger");
-    _warningLogger = spdlog::stdout_color_mt(_instanceId + "warning_logger");
-    _errorLogger = spdlog::stdout_color_mt(_instanceId + "error_logger");
-    _criticalLogger = spdlog::stdout_color_mt(_instanceId + "critical_logger");
-    _customLogger = spdlog::stdout_color_mt(_instanceId + "custom_logger");
+    //Workround to turn off console logs
+    if(!enableConsoleLogging)
+    {
+      std::vector<spdlog::sink_ptr> console_sinks;
+      _traceLogger = std::make_shared<spdlog::logger>(_instanceId + "_trace_logger", console_sinks.begin(), console_sinks.end());
+      _debugLogger = std::make_shared<spdlog::logger>(_instanceId +"debug_logger", console_sinks.begin(), console_sinks.end());
+      _infoLogger = std::make_shared<spdlog::logger>(_instanceId + "info_logger", console_sinks.begin(), console_sinks.end());
+      _warningLogger = std::make_shared<spdlog::logger>(_instanceId + "warning_logger", console_sinks.begin(), console_sinks.end());
+      _errorLogger = std::make_shared<spdlog::logger>(_instanceId + "error_logger", console_sinks.begin(), console_sinks.end());
+      _criticalLogger = std::make_shared<spdlog::logger>(_instanceId + "critical_logger", console_sinks.begin(), console_sinks.end());
+      _customLogger = std::make_shared<spdlog::logger>(_instanceId + "custom_logger", console_sinks.begin(), console_sinks.end());
+    }
+    else
+    {
+      _traceLogger = spdlog::stdout_color_mt(_instanceId + "trace_logger");
+      _debugLogger = spdlog::stdout_color_mt(_instanceId +"debug_logger");
+      _infoLogger = spdlog::stdout_color_mt(_instanceId + "info_logger");
+      _warningLogger = spdlog::stdout_color_mt(_instanceId + "warning_logger");
+      _errorLogger = spdlog::stdout_color_mt(_instanceId + "error_logger");
+      _criticalLogger = spdlog::stdout_color_mt(_instanceId + "critical_logger");
+      _customLogger = spdlog::stdout_color_mt(_instanceId + "custom_logger");
+    }
 
     bool shouldLogFile = !_logFileName.empty();
 
