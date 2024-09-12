@@ -109,6 +109,18 @@ namespace mgutils {
       }
       // File created, nothing else to do
     }
+
+    // Delete a file if it exists
+    static void deleteFileIfExists(const std::string& path) {
+      std::filesystem::path filePath(path);
+      if (std::filesystem::exists(filePath)) {
+        if (!std::filesystem::remove(filePath)) {
+          throw FilesException("Failed to delete file: " + path);
+        }
+      } else {
+        throw FilesException("File does not exist: " + path);
+      }
+    }
   };
 
 } // namespace mgutils
