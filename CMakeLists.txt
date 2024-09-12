@@ -71,6 +71,9 @@ FetchContent_Declare(
     SOURCE_DIR ${EXTERNAL_DIR}/onetbb
 )
 set(BUILD_SHARED_LIBS ON)
+set(TBB_TEST OFF)
+set(TBB_INSTALL OFF)
+set(TBB4PY_BUILD OFF)
 FetchContent_MakeAvailable(onetbb)
 set(BUILD_SHARED_LIBS OFF)
 message(STATUS "oneTBB fetched and made available.")
