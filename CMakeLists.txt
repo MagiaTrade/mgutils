@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(MGUTILS_BUILD_TESTS "Build the tests" ON)
 option(MGUTILS_BUILD_EXAMPLES "Build the examples" ON)
+option(MGUTILS_BUILD_WITH_LUA "Build lua lib along with mgtutils" OFF)
+option(MGUTILS_BUILD_WITH_SOL "Build sol2 lib along with mgtutils" OFF)
 
 set(MG_UTILS_FILES
     include/mgutils/Logger.h
@@ -70,6 +72,7 @@ FetchContent_Declare(
     GIT_TAG aae7fa62d1ffecd0af05bbd328899845c33be327
     SOURCE_DIR ${EXTERNAL_DIR}/onetbb
 )
+
 set(BUILD_SHARED_LIBS ON)
 set(TBB_TEST OFF)
 set(TBB_INSTALL OFF)
@@ -107,6 +110,42 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(rapidcsv)
 message(STATUS "rapidcsv fetched and made available.")
 
+set(MGUTILS_INCLUDED_LIBS)
+
+if(MGUTILS_BUILD_WITH_LUA)
+    message(STATUS "Fetching lua...")
+    FetchContent_Declare(
+        lua
+        GIT_REPOSITORY https://github.com/walterschell/Lua.git
+        GIT_TAG 88246d621abf7b6fba9332f49229d507f020e450
+        SOURCE_DIR ${EXTERNAL_DIR}/lua
+    )
+    set(LUA_ENABLE_SHARED OFF)
+    set(LUA_ENABLE_TESTING OFF)
+    FetchContent_MakeAvailable(lua)
+
+    list(APPEND MGUTILS_INCLUDED_LIBS lua_static)
+endif()
+
+if(MGUTILS_BUILD_WITH_SOL)
+    message(STATUS "Fetching sol2...")
+    FetchContent_Declare(
+        sol2
+        GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+        GIT_TAG dca62a0f02bb45f3de296de3ce00b1275eb34c25
+        SOURCE_DIR ${EXTERNAL_DIR}/sol2
+    )
+    set(SOL2_SYSTEM_INCLUDE OFF)
+    set(SOL2_ENABLE_INSTALL OFF)
+    set(SOL2_TESTS_SINGLE OFF)
+    set(SOL2_TESTS_INTEROP_EXAMPLES OFF)
+    set(SOL2_TESTS_DYNAMIC_LOADING_EXAMPLES OFF)
+    set(BUILD_LUA_AS_DLL OFF)
+    FetchContent_MakeAvailable(sol2)
+    list(APPEND MGUTILS_INCLUDED_LIBS sol2)
+endif()
+
+
 ## BOOST BEGIN -------------
 find_package(Boost REQUIRED)
 
@@ -137,6 +176,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog::spdlog_header_only
     TBB::tbb
+    ${MGUTILS_INCLUDED_LIBS}
 )
 
 if (${MGUTILS_BUILD_TESTS})
