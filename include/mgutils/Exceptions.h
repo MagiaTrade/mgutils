@@ -26,32 +26,32 @@ namespace mgutils
     }
   };
 
-  class FilesException : Exception {
+  class FilesException : public Exception {
   public:
    using Exception::Exception;
   };
 
-  class JsonParseException : Exception {
+  class JsonParseException : public Exception{
   public:
     using Exception::Exception;
   };
 
-  class JsonUsageException : Exception {
+  class JsonUsageException : public Exception{
   public:
     using Exception::Exception;
   };
 
-  class CsvWriteException : Exception {
+  class CsvWriteException : public Exception{
   public:
     using Exception::Exception;
   };
 
-  class CsvReadException : Exception {
+  class CsvReadException : public Exception{
   public:
     using Exception::Exception;
   };
 
-  class CsvUsageException : Exception {
+  class CsvUsageException : public Exception{
   public:
     using Exception::Exception;
   };
