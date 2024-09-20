@@ -14,6 +14,7 @@
 #include <cmath>  // Para isnan()
 #include <cstdint>
 #include <cctype>
+#include <chrono>
 
 #define fNaN (std::numeric_limits<float>::quiet_NaN())
 
@@ -81,6 +82,12 @@ namespace mgutils
 //  bool isValid<char>(char value) {
 //    return value != INVALID_CHAR;
 //  }
+
+  inline int64_t getCurrentTimestampInMillis() {
+    auto now = std::chrono::system_clock::now();
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    return millis;
+  }
 
   inline std::string generateUUID()
   {
