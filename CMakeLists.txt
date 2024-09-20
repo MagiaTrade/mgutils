@@ -10,24 +10,11 @@ option(MGUTILS_BUILD_EXAMPLES "Build the examples" ON)
 option(MGUTILS_BUILD_WITH_LUA "Build lua lib along with mgtutils" OFF)
 option(MGUTILS_BUILD_WITH_SOL "Build sol2 lib along with mgtutils" OFF)
 
-set(MG_UTILS_FILES
-    include/mgutils/Logger.h
-    src/Logger.cpp
-    include/mgutils/Utils.h
-    include/mgutils/ErrorManager.h
-    include/mgutils/JobPool.h
-    src/Json.cpp include/mgutils/Json.h
-    src/Json.cpp src/Json.cpp
-    src/json/JsonDocument.cpp
-    include/mgutils/json/JsonDocument.h
-    src/json/JsonValue.cpp
-    include/mgutils/json/JsonValue.h
-    include/mgutils/CsvLoader.h
-    include/mgutils/Files.h
-    include/mgutils/Exceptions.h)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/mgutils.cmake)
 
 add_library(${PROJECT_NAME}  STATIC
-    ${MG_UTILS_FILES}
+    ${MGUTILS_HEADERS}
+    ${MGUTILS_SRCS}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -162,7 +149,7 @@ endif()
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    include
+    ${MGUTILS_INCLUDE_DIRS}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
