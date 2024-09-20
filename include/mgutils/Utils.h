@@ -15,6 +15,8 @@
 #include <cstdint>
 #include <cctype>
 #include <chrono>
+#include <iostream>
+#include <ctime>
 
 #define fNaN (std::numeric_limits<float>::quiet_NaN())
 
@@ -88,6 +90,18 @@ namespace mgutils
     auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     return millis;
   }
+
+  inline std::string extractTimestampTimeWithMillis(int64_t timestampMs)
+  {
+    auto now_time_t = static_cast<std::time_t>(timestampMs / 1000);
+    auto now_ms = timestampMs % 1000;
+    std::tm now_tm = *std::localtime(&now_time_t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&now_tm, "%H%M%S") << std::setw(3) << std::setfill('0') << now_ms;
+    return oss.str();
+  }
+
 
   inline std::string generateUUID()
   {
