@@ -91,6 +91,17 @@ namespace mgutils
     return millis;
   }
 
+  inline static std::string getDateFromTimestamp(int64_t timestamp)
+  {
+    std::time_t timeInSeconds = timestamp / 1000;
+    std::tm* tm = std::gmtime(&timeInSeconds);
+    char buffer[9];
+    std::strftime(buffer, sizeof(buffer), "%Y%m%d", tm);
+
+    return buffer;
+  }
+
+
   inline std::string extractTimestampTimeWithMillis(int64_t timestampMs)
   {
     auto now_time_t = static_cast<std::time_t>(timestampMs / 1000);
