@@ -17,8 +17,14 @@ namespace mgutils {
   class Files {
   public:
     // Check if the path is a file
-    static bool isFile(const std::string& path) {
-      return std::filesystem::is_regular_file(std::filesystem::path(path));
+    static bool isFile(const std::string& path)
+    {
+      return std::filesystem::is_regular_file(std::filesystem::path(path));;
+    }
+
+    static bool fileExists(const std::string& path)
+    {
+      return (std::filesystem::exists(path));
     }
 
     // Check if the path is a directory
@@ -117,8 +123,6 @@ namespace mgutils {
         if (!std::filesystem::remove(filePath)) {
           throw FilesException("Failed to delete file: " + path);
         }
-      } else {
-        throw FilesException("File does not exist: " + path);
       }
     }
   };
