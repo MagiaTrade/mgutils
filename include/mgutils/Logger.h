@@ -300,6 +300,26 @@ namespace mgutils
       }
     }
   };
+
+
+class UniversalStreamLogger
+{
+public:
+  inline static mgutils::Logger& instance()
+  {
+    static mgutils::Logger logger;
+    return logger;
+  }
+};
+
+
 } // namespace mgutils
+
+#define logT mgutils::UniversalStreamLogger::instance().log(mgutils::Trace)
+#define logD mgutils::UniversalStreamLogger::instance().log(mgutils::Debug)
+#define logI mgutils::UniversalStreamLogger::instance().log(mgutils::Info)
+#define logW mgutils::UniversalStreamLogger::instance().log(mgutils::Warning)
+#define logE mgutils::UniversalStreamLogger::instance().log(mgutils::Error)
+#define logC mgutils::UniversalLogger::instance().log(mgutils::Critical)
 
 #endif //MGUTILS_LOGGER_H
