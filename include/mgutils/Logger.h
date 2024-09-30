@@ -320,6 +320,6 @@ public:
 #define logI mgutils::UniversalStreamLogger::instance().log(mgutils::Info)
 #define logW mgutils::UniversalStreamLogger::instance().log(mgutils::Warning)
 #define logE mgutils::UniversalStreamLogger::instance().log(mgutils::Error)
-#define logC mgutils::UniversalLogger::instance().log(mgutils::Critical)
+#define logC mgutils::UniversalStreamLogger::instance().log(mgutils::Critical)
 
 #endif //MGUTILS_LOGGER_H
