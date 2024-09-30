@@ -30,7 +30,7 @@
         std::ostringstream oss;                                            \
         oss << message << " (Critical code: " << code                      \
             << ", File: " << __FILE__ << ", Line: " << __LINE__ << ")";    \
-        Logger::instance().log(mgutils::LogLevel::Critical, oss.str());    \
+        mgutils::Logger::instance().log(mgutils::LogLevel::Critical, oss.str());    \
         mgutils::ErrorInfo errorInfo(code, message, __FILE__, __LINE__);   \
         mgutils::ErrorManager::instance().notify(errorInfo);               \
     } while (0)
