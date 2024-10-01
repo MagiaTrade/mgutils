@@ -39,12 +39,8 @@ _logFileName(logFilename)
       _customLogger = spdlog::stdout_color_mt(_instanceId + "custom_logger");
     }
 
-    bool shouldLogFile = !_logFileName.empty();
-
-    if(shouldLogFile)
-      _fileLogger = spdlog::basic_logger_mt(_instanceId + "file_logger", _logFileName);
-    else
-      _fileLogger = std::make_shared<spdlog::logger>(_instanceId + "file_logger");
+    if(!_logFileName.empty())
+      addFileSink(_logFileName);
 
     setPattern(_cachedPattern);
 
@@ -91,7 +87,8 @@ void Logger::flush() const
   _errorLogger->flush();
   _criticalLogger->flush();
   _customLogger->flush();
-  _fileLogger->flush();
+  if(_fileLogger)
+    _fileLogger->flush();
 }
 
 // Set the global log level for the logger
@@ -153,25 +150,62 @@ void Logger::setPattern(const std::string& pattern, bool usesConsoleTag)
   _criticalLogger->set_pattern(_criticalPattern);
 
 
-  _fileLogger->set_pattern(_cachedPattern);
+  if(_fileLogger)
+    _fileLogger->set_pattern(_cachedPattern);
 }
 
 // Add a file sink for logging to a file
-void Logger::addFileSink(const std::string& filename)
-{
-  auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
-  _fileLogger->sinks().push_back(file_sink);
-  _fileLogger->set_pattern(_cachedPattern);
-}
+  void Logger::addFileSink(const std::string& filename)
+  {
+    // Se o _fileLogger ainda não foi inicializado, inicialize-o como basic_logger_mt
+    if(!_fileLogger)
+    {
+      _fileLogger = spdlog::basic_logger_mt(_instanceId + "file_logger", filename);
+
+      // Definir o nível de log dependendo do modo de compilação
+#ifdef DEBUG
+      _fileLogger->set_level(spdlog::level::trace);
+#else
+      _fileLogger->set_level(spdlog::level::info);
+#endif
+
+      _fileLogger->set_pattern(_cachedPattern);  // Definir o padrão
+    }
+    else
+    {
+      // Se já existe, adicione o novo sink
+      auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
+      _fileLogger->sinks().push_back(file_sink);
+    }
+
+    _fileLogger->flush_on(spdlog::level::err);  // Exemplo: Forçar flush em erros
+  }
 
 // Add a rotating file sink for logging to files with rotation based on size
-void Logger::addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files)
-{
-  auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
-  _fileLogger->sinks().push_back(rotating_sink);
-  _fileLogger->set_pattern(_cachedPattern);
-}
+  void Logger::addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files)
+  {
+    // Se o _fileLogger ainda não foi inicializado, inicialize-o como basic_logger_mt
+    if(!_fileLogger)
+    {
+      auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
+      _fileLogger = std::make_shared<spdlog::logger>(_instanceId + "file_logger", rotating_sink);
 
+      // Definir o nível de log dependendo do modo de compilação
+#ifdef DEBUG
+      _fileLogger->set_level(spdlog::level::trace);
+#else
+      _fileLogger->set_level(spdlog::level::info);
+#endif
+
+      _fileLogger->set_pattern(_cachedPattern);  // Definir o padrão
+    }
+    else
+    {
+      // Se já existe, adicione o novo sink rotativo
+      auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
+      _fileLogger->sinks().push_back(rotating_sink);
+    }
+  }
 
 LogMessage::LogMessage(Logger& logger, LogLevel level):
 _logger(logger), _level(level)

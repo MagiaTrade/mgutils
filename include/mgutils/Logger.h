@@ -246,27 +246,33 @@ namespace mgutils
         switch (level) {
           case LogLevel::Trace:
             logger->trace(formattedMessage);
-            _fileLogger->trace(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->trace(formattedMessage);
             break;
           case LogLevel::Debug:
             logger->debug(formattedMessage);
-            _fileLogger->debug(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->debug(formattedMessage);
             break;
           case LogLevel::Info:
             logger->info(formattedMessage);
-            _fileLogger->info(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->info(formattedMessage);
             break;
           case LogLevel::Warning:
             logger->warn(formattedMessage);
-            _fileLogger->warn(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->warn(formattedMessage);
             break;
           case LogLevel::Error:
             logger->error(formattedMessage);
-            _fileLogger->error(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->error(formattedMessage);
             break;
           case LogLevel::Critical:
             logger->critical(formattedMessage);
-            _fileLogger->critical(formattedMessage);
+            if(_fileLogger)
+              _fileLogger->critical(formattedMessage);
             break;
         }
       } else {
@@ -274,27 +280,33 @@ namespace mgutils
         switch (level) {
           case LogLevel::Trace:
             logger->trace(format);
-            _fileLogger->trace(format);
+            if(_fileLogger)
+              _fileLogger->trace(format);
             break;
           case LogLevel::Debug:
             logger->debug(format);
-            _fileLogger->debug(format);
+            if(_fileLogger)
+              _fileLogger->debug(format);
             break;
           case LogLevel::Info:
             logger->info(format);
-            _fileLogger->info(format);
+            if(_fileLogger)
+              _fileLogger->info(format);
             break;
           case LogLevel::Warning:
             logger->warn(format);
-            _fileLogger->warn(format);
+            if(_fileLogger)
+              _fileLogger->warn(format);
             break;
           case LogLevel::Error:
             logger->error(format);
-            _fileLogger->error(format);
+            if(_fileLogger)
+              _fileLogger->error(format);
             break;
           case LogLevel::Critical:
             logger->critical(format);
-            _fileLogger->critical(format);
+            if(_fileLogger)
+              _fileLogger->critical(format);
             break;
         }
       }

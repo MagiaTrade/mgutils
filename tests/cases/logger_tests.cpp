@@ -208,7 +208,6 @@ TEST_CASE("Logger logs messages at all levels", "[logger]")
 TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
 {
   auto& logger = Logger::instance();
-  logger.setPattern("%v");
   std::string logFilename = "rotating_log";
   std::size_t maxSize = 500;  // 1 KB
   std::size_t maxFiles = 9;    // Máximo de 3 arquivos de backup, 4 no total com o ativo
@@ -228,6 +227,10 @@ TEST_CASE("Logger rotates log files based on size", "[logger][rotation]")
   logger.addRotatingFileSink(logFilename, maxSize, maxFiles);
 
   logger.setLogLevel(Info);
+
+  // Set the patter after adding sink files
+  logger.setPattern("%v");
+
 
   // 75 to discount the INFO: Log entry <n>: prefix of eacho log
   // this way each line is almost 100 characters
@@ -329,7 +332,9 @@ TEST_CASE("Logger supports stream operator <<", "[logger][stream]")
 
 TEST_CASE("Logger macros", "[logger][macros]")
 {
-  Logger::instance().setPattern("%v", true);
+  auto &logger = mgutils::Logger::instance();
+  logger.addFileSink("logs.txt");
+  logger.setPattern("%v", true);
   std::ifstream logFile("logs.txt");
   std::string line;
   std::string lastLogContent;
@@ -337,7 +342,7 @@ TEST_CASE("Logger macros", "[logger][macros]")
   SECTION("ERROR")
   {
     NOTIFY_ERROR(404, "Page not found");
-    Logger::instance().flush();
+    logger.flush();
 
     REQUIRE(logFile.is_open());
     while (std::getline(logFile, line)) {
@@ -349,7 +354,7 @@ TEST_CASE("Logger macros", "[logger][macros]")
   SECTION("CRITICAL")
   {
     NOTIFY_CRITICAL(505, "Danger!");
-    Logger::instance().flush();
+    logger.flush();
 
     REQUIRE(logFile.is_open());
 
