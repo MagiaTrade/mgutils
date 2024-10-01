@@ -311,6 +311,8 @@ namespace mgutils
         }
       }
     }
+  private:
+    LogLevel _currentLevel = LogLevel::Trace;
   };
 } // namespace mgutils
 

@@ -44,11 +44,7 @@ _logFileName(logFilename)
 
     setPattern(_cachedPattern);
 
-#ifdef DEBUG
-    spdlog::set_level(spdlog::level::trace);
-#else
-    spdlog::set_level(spdlog::level::info);
-#endif
+    setLogLevel(LogLevel::Trace);
 
   } catch (const spdlog::spdlog_ex& ex) {
     throw std::runtime_error("Failed to initialize logger: " + std::string(ex.what()));
@@ -123,8 +119,10 @@ void Logger::setLogLevel(LogLevel level)
       spdlog::set_level(spdlog::level::critical); // Enable logging at critical level only
       break;
     default:
-      break;
+      return;
   }
+
+  _currentLevel = level;
 }
 
 // Cache the logging pattern and prepare preformatted patterns for each log level
@@ -161,14 +159,7 @@ void Logger::setPattern(const std::string& pattern, bool usesConsoleTag)
     if(!_fileLogger)
     {
       _fileLogger = spdlog::basic_logger_mt(_instanceId + "file_logger", filename);
-
-      // Definir o nível de log dependendo do modo de compilação
-#ifdef DEBUG
-      _fileLogger->set_level(spdlog::level::trace);
-#else
-      _fileLogger->set_level(spdlog::level::info);
-#endif
-
+      setLogLevel(_currentLevel);
       _fileLogger->set_pattern(_cachedPattern);  // Definir o padrão
     }
     else
@@ -189,14 +180,7 @@ void Logger::setPattern(const std::string& pattern, bool usesConsoleTag)
     {
       auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, max_size, max_files);
       _fileLogger = std::make_shared<spdlog::logger>(_instanceId + "file_logger", rotating_sink);
-
-      // Definir o nível de log dependendo do modo de compilação
-#ifdef DEBUG
-      _fileLogger->set_level(spdlog::level::trace);
-#else
-      _fileLogger->set_level(spdlog::level::info);
-#endif
-
+      setLogLevel(_currentLevel);
       _fileLogger->set_pattern(_cachedPattern);  // Definir o padrão
     }
     else
