@@ -84,6 +84,62 @@ namespace mgutils
 //  bool isValid<char>(char value) {
 //    return value != INVALID_CHAR;
 //  }
+  inline int64_t parseTimeToMillis(const std::string& timeStr)
+  {
+    // timeStr can be in format HHMMSS or HHMMSSMMM
+    std::tm tm = {};
+    std::string hourStr;
+    std::string minuteStr;
+    std::string secondStr;
+    std::string millisecondsStr = "000";
+
+    int32_t hours;
+    int32_t minutes;
+    int32_t seconds;
+    int32_t milliseconds;
+
+    // Check if the timeStr length is valid
+    if (timeStr.length() == 6 || timeStr.length() == 9)
+    {
+      // Extract HH, MM, SS
+      hourStr = timeStr.substr(0, 2);
+      minuteStr = timeStr.substr(2, 2);
+      secondStr = timeStr.substr(4, 2);
+
+      if (timeStr.length() == 9)
+        millisecondsStr = timeStr.substr(6, 3);
+
+      try
+      {
+        hours = std::stoi(hourStr);
+        minutes = std::stoi(minuteStr);
+        seconds = std::stoi(secondStr);
+        milliseconds = std::stoi(millisecondsStr);
+      }
+      catch (const std::exception&)
+      {
+        throw std::invalid_argument("Invalid time components in time string");
+      }
+
+      if (hours < 0 || hours > 23 ||
+          minutes < 0 || minutes > 59 ||
+          seconds < 0 || seconds > 59 ||
+          milliseconds < 0 || milliseconds > 999)
+      {
+        throw std::out_of_range("Time values out of range!");
+      }
+
+    }
+    else
+    {
+      throw std::invalid_argument("Invalid format. Use HHMMSSMMM or HHMMSS");
+    }
+
+    auto timeOffset = std::chrono::hours(hours) + std::chrono::minutes(minutes) + std::chrono::seconds(seconds) +
+                      std::chrono::milliseconds(milliseconds);
+
+    return timeOffset.count();
+  }
 
   inline int64_t getCurrentTimestampInMillis() {
     auto now = std::chrono::system_clock::now();
