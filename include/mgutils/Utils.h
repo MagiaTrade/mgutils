@@ -141,6 +141,22 @@ namespace mgutils
     return timeOffset.count();
   }
 
+  inline static std::chrono::system_clock::time_point parseDate(const std::string& date)
+  {
+    std::tm tm = {};
+    std::stringstream ss(date);
+    ss >> std::get_time(&tm, "%Y%m%d");
+    auto time = std::mktime(&tm);
+    return std::chrono::system_clock::from_time_t(time);
+  }
+
+  inline static int64_t parseDateToMillis(const std::string& date)
+  {
+    auto time = parseDate(date);
+    int64_t milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
+    return milliseconds_since_epoch;
+  }
+
   inline int64_t getCurrentTimestampInMillis() {
     auto now = std::chrono::system_clock::now();
     auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
