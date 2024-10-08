@@ -13,6 +13,7 @@
 #include "mgutils/ErrorManager.h"
 #include "mgutils/EventManager.h"
 #include "mgutils/Files.h"
+#include "mgutils/Scheduler.h"
 #include "mgutils/Exceptions.h"
 #include "mgutils/json/JsonDocument.h"
 #include "mgutils/json/JsonValue.h"

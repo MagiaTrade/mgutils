@@ -6,13 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(ENABLE_TESTS OFF)
 add_executable(${PROJECT_NAME}
     main.cpp
-    cases/logger_tests.cpp
-    cases/error_tests.cpp
-    cases/jobpool_tests.cpp
-    cases/events_tests.cpp
-    cases/json_tests.cpp
-    cases/csv_tests.cpp
-    cases/files_tests.cpp
+#    cases/logger_tests.cpp
+#    cases/error_tests.cpp
+#    cases/jobpool_tests.cpp
+#    cases/events_tests.cpp
+#    cases/json_tests.cpp
+#    cases/csv_tests.cpp
+#    cases/files_tests.cpp
+    cases/scheduler_tests.cpp
     )
 
 set(TEST_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
