@@ -1,6 +1,7 @@
 //
 // Created by Arthur Motelevicz on 07/10/24.
 //
+#include <thread>
 #include <catch2/catch.hpp>
 #include "mgutils/Scheduler.h"
 
