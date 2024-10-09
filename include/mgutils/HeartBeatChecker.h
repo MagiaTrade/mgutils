@@ -29,6 +29,7 @@ namespace mgutils
 
     ~HeartBeatChecker()
     {
+      logD << "Destructor HeartBeatChecker";
       stop();
     }
 
