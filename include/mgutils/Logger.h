@@ -35,6 +35,13 @@
         mgutils::ErrorManager::instance().notify(errorInfo);               \
     } while (0)
 
+#define logT mgutils::Logger::instance().log(mgutils::Trace)
+#define logD mgutils::Logger::instance().log(mgutils::Debug)
+#define logI mgutils::Logger::instance().log(mgutils::Info)
+#define logW mgutils::Logger::instance().log(mgutils::Warning)
+#define logE mgutils::Logger::instance().log(mgutils::Error)
+#define logC mgutils::Logger::instance().log(mgutils::Critical)
+
 namespace mgutils
 {
   // ANSI color codes for formatting log output
@@ -150,7 +157,11 @@ namespace mgutils
     void addRotatingFileSink(const std::string& filename, std::size_t max_size, std::size_t max_files);
 
     explicit Logger(const std::string& logFilename = "", bool enableConsoleLogging = true);
-    ~Logger() = default;
+    ~Logger()
+    {
+      logI << "[Logger] Destructor";
+      spdlog::shutdown();
+    };
 
     // Disable copy
     Logger(const Logger&) = delete;
@@ -316,11 +327,5 @@ namespace mgutils
   };
 } // namespace mgutils
 
-#define logT mgutils::Logger::instance().log(mgutils::Trace)
-#define logD mgutils::Logger::instance().log(mgutils::Debug)
-#define logI mgutils::Logger::instance().log(mgutils::Info)
-#define logW mgutils::Logger::instance().log(mgutils::Warning)
-#define logE mgutils::Logger::instance().log(mgutils::Error)
-#define logC mgutils::Logger::instance().log(mgutils::Critical)
 
 #endif //MGUTILS_LOGGER_H
