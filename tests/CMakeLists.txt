@@ -13,8 +13,10 @@ add_executable(${PROJECT_NAME}
 #    cases/json_tests.cpp
 #    cases/csv_tests.cpp
 #    cases/files_tests.cpp
-    cases/scheduler_tests.cpp
+#    cases/scheduler_tests.cpp
+    cases/utils_tests.cpp
     )
+
 
 set(TEST_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 

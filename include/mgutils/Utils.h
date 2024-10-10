@@ -36,55 +36,118 @@
 
 namespace mgutils
 {
-//  template<typename T>
-//  bool isValid(T value);
-//
-//  template<>
-//  bool isValid<float>(float value) {
-//    return !std::isnan(value);
-//  }
-//
-//  template<>
-//  bool isValid<double>(double value) {
-//    return !std::isnan(value);
-//  }
-//
-//  template<>
-//  bool isValid<int8_t>(int8_t value) {
-//    return value != INVALID_INT8;
-//  }
-//
-//// Especialização para int16_t
-//  template<>
-//  bool isValid<int16_t>(int16_t value) {
-//    return value != INVALID_INT16;
-//  }
-//
-//  template<>
-//  bool isValid<int32_t>(int32_t value) {
-//    return value != INVALID_INT32;
-//  }
-//
-//  template<>
-//  bool isValid<int64_t>(int64_t value) {
-//    return value != INVALID_INT64;
-//  }
-//
-//  template<>
-//  bool isValid<uint32_t>(uint32_t value) {
-//    return value != INVALID_UINT32;
-//  }
-//
-//  template<>
-//  bool isValid<uint64_t>(uint64_t value) {
-//    return value != INVALID_UINT64;
-//  }
-//
-//  template<>
-//  bool isValid<char>(char value) {
-//    return value != INVALID_CHAR;
-//  }
-  inline int64_t parseTimeToMillis(const std::string& timeStr)
+  inline int64_t parseDateTimeWithFormat(const std::string& dateTimeStr, const std::string& format)
+  {
+    std::tm tm = {};
+    int32_t milliseconds = 0;
+
+    // Primeiro, faz o parse da parte da data e hora
+    size_t dotPos = dateTimeStr.find('.'); // Encontra a posição do ponto (separador de milissegundos)
+    std::string dateTimePart = dateTimeStr.substr(0, dotPos); // Pega só a parte da data e hora
+
+    std::istringstream ss(dateTimePart);
+    ss >> std::get_time(&tm, format.c_str());
+
+    // Verifica se a parte da data e hora foi completamente lida
+    if (ss.fail() || !ss.eof())
+    {
+      throw std::invalid_argument("Failed to parse date and time with the given format.");
+    }
+
+    // Se houver ponto, tenta extrair a parte dos milissegundos
+    if (dotPos != std::string::npos)
+    {
+      std::string millisPart = dateTimeStr.substr(dotPos + 1);
+      try
+      {
+        milliseconds = std::stoi(millisPart);
+        if (milliseconds < 0 || milliseconds > 999)
+        {
+          throw std::out_of_range("Milliseconds out of range!");
+        }
+      }
+      catch (const std::exception&)
+      {
+        throw std::invalid_argument("Invalid milliseconds part.");
+      }
+    }
+
+    // Converte a data/hora para tempo desde o epoch
+    auto timePoint = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    auto timeMillis = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch()).count();
+
+    // Adiciona os milissegundos, se houver
+    return timeMillis + milliseconds;
+  }
+
+  inline int64_t parseTimeWithFormat(const std::string& timeStr, const std::string& format)
+  {
+    std::tm tm = {};
+    int32_t milliseconds = 0;
+
+    // Verifica se o formato contém o ponto de separação para milissegundos
+    bool hasMillisSeparator = format.find('.') != std::string::npos;
+
+    std::string timePart;
+    std::string millisPart = "000"; // Assumimos 0 milissegundos por padrão
+
+    if (hasMillisSeparator)
+    {
+      // Encontra a posição do ponto (separador de milissegundos)
+      size_t dotPos = timeStr.find('.');
+      timePart = timeStr.substr(0, dotPos); // Parte de tempo sem milissegundos
+
+      // Se houver ponto, extrai a parte dos milissegundos
+      if (dotPos != std::string::npos)
+      {
+        millisPart = timeStr.substr(dotPos + 1); // Extrai a parte dos milissegundos
+      }
+    }
+    else
+    {
+      // Caso não tenha ponto de milissegundos, assume que os últimos 3 dígitos são os milissegundos
+      if (timeStr.length() > 8) // HHMMSSMMM
+      {
+        timePart = timeStr.substr(0, timeStr.length() - 3);  // Parte de HHMMSS
+        millisPart = timeStr.substr(timeStr.length() - 3);   // Últimos 3 dígitos são os milissegundos
+      }
+      else
+      {
+        timePart = timeStr; // Sem milissegundos
+      }
+    }
+
+    // Faz o parsing da parte de tempo (HHMMSS) de acordo com o formato fornecido
+    std::istringstream ss(timePart);
+    ss >> std::get_time(&tm, format.c_str());
+
+    if (ss.fail() || !ss.eof())
+    {
+      throw std::invalid_argument("Failed to parse time with the given format.");
+    }
+
+    // Tenta converter os milissegundos (assumidos ou extraídos)
+    try
+    {
+      milliseconds = std::stoi(millisPart);
+      if (milliseconds < 0 || milliseconds > 999)
+      {
+        throw std::out_of_range("Milliseconds out of range!");
+      }
+    }
+    catch (const std::exception&)
+    {
+      throw std::invalid_argument("Invalid milliseconds part.");
+    }
+
+    // Converte o tempo para milissegundos
+    auto timeOffset = std::chrono::hours(tm.tm_hour) + std::chrono::minutes(tm.tm_min) + std::chrono::seconds(tm.tm_sec) +
+                      std::chrono::milliseconds(milliseconds);
+
+    return timeOffset.count();
+  }
+
+  [[deprecated("Use parseTimeWithFormat() instead")]] inline int64_t parseTimeToMillis(const std::string& timeStr)
   {
     // timeStr can be in format HHMMSS or HHMMSSMMM
     std::tm tm = {};
