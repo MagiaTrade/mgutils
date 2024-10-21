@@ -19,4 +19,6 @@
 #include "mgutils/json/JsonDocument.h"
 #include "mgutils/json/JsonValue.h"
 
+#include "mgutils/models/Trade.h"
+
 #endif //MMDPERSISTOR_MGUTILS_H
