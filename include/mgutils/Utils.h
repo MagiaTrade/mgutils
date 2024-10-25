@@ -335,10 +335,14 @@ namespace mgutils
     }
 
 
-    inline bool isNumber(const std::string& str) {
-      return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
-    }
+//    inline bool isNumber(const std::string& str) {
+//      return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+//    }
 
+    inline bool isNumber(const std::string& str) {
+      return !str.empty() &&
+             std::all_of(str.begin(), str.end(), [](unsigned char c) { return std::isdigit(c); });
+    }
 
   }// namespace string
 
